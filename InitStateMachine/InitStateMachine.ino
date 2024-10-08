@@ -84,6 +84,9 @@ void loop() {
   }
 
   if(!digitalRead(BUTTON_PIN)){
+    if(justChanged){
+      Serial.print("Button just read low\n");
+    }
     justChanged = false;
   }
 
@@ -94,6 +97,9 @@ void cycleState() {
   if(!justChanged){
     currState++;
     justChanged = true;
+    Serial.print("Just changed state to: ");
+    Serial.print(currState);
+    Serial.print("\n");
   }
 }
 
