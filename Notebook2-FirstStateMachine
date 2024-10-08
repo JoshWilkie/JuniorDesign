@@ -1,0 +1,72 @@
+#define BUTTON_PIN 3
+#define KILLSWITCH_PIN 2
+
+
+const int motorPin1 = 5; //Pin 7 on L293
+const int motorPin2 = 6; // Pin 2 on L293
+const int motorPin3 = 10; // Pin 15 on L293
+const int motorPin4 = 9; // Pin 10 on L293
+
+
+volatile int currState = 0;
+
+
+// initialize digital pins for motors as an output.
+void rotate_wide_right();
+void rotate_right();
+void rotate_in_place_right();
+void rotate_wide_left();
+void rotate_left();
+void rotate_in_place_left();
+void forward();
+void backward();
+void reset();
+
+
+void setup() {
+  pinMode(KILLSWITCH_PIN, INPUT);
+  pinMode(BUTTON_PIN, INPUT);
+  pinMode(motorPin1, OUTPUT);
+  pinMode(motorPin2, OUTPUT);
+  pinMode(motorPin3, OUTPUT);
+  pinMode(motorPin4, OUTPUT);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), cycleState, RISING);
+  attachInterrupt(digitalPinToInterrupt(KILLSWITCH_PIN), reset, RISING);
+  Serial.begin(9600);
+}
+
+
+void loop() {
+  Serial.print(digitalRead(BUTTON_PIN));
+  Serial.print(currState);
+  Serial.print("\n");
+  delay(3000);
+  if((currState <= 0) or (currState >=9)){
+    currState = 1;
+  }
+  if(currState == 1){
+    Serial.print("Going forward\n");
+    forward();
+  }else if(currState == 2){
+    backward();
+  }else if(currState == 3){
+    rotate_left();
+  }else if(currState == 4){
+    rotate_wide_left();
+  }else if(currState == 5){
+    rotate_right();
+  }else if(currState == 6){
+    rotate_wide_right();
+  }else if(currState == 7){
+    rotate_in_place_left();
+  }else if(currState == 8){
+    rotate_in_place_right();
+  }else{
+    reset();
+  }
+}
+
+
+void cycleState() {
+  currState++;
+}
