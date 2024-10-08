@@ -1,0 +1,166 @@
+// initialize digital pins for motors as an output.
+void rotate_wide_right();
+void rotate_right();
+void rotate_in_place_right();
+void rotate_wide_left();
+void rotate_left();
+void rotate_in_place_left();
+void forward();
+void backward();
+
+
+const int motorPin1 = 5; //Pin 7 on L293
+const int motorPin2 = 6; // Pin 2 on L293
+const int motorPin3 = 10; // Pin 15 on L293
+const int motorPin4 = 9; // Pin 10 on L293
+
+
+void setup() {
+ pinMode(motorPin1, OUTPUT);
+ pinMode(motorPin2, OUTPUT);
+ pinMode(motorPin3, OUTPUT);
+ pinMode(motorPin4, OUTPUT);
+}
+
+
+void loop() {
+  // rotate_wide_right();
+  // rotate_right();
+  // rotate_in_place_right();
+  // rotate_wide_left();
+  // rotate_left();
+  // rotate_in_place_left();
+  // forward();
+  // backward();
+  reset();
+}
+
+
+void reset(){
+  digitalWrite(motorPin1,LOW);
+  digitalWrite(motorPin2,LOW);
+  digitalWrite(motorPin3,LOW);
+  digitalWrite(motorPin4,LOW);
+}
+
+
+void rotate_wide_right(){
+ digitalWrite(motorPin3,LOW);
+ analogWrite(motorPin4,150);
+ digitalWrite(motorPin1,LOW);
+ analogWrite(motorPin2,230);
+ delay(1000);
+ digitalWrite(motorPin1,LOW);
+ digitalWrite(motorPin2,LOW);
+ digitalWrite(motorPin3,LOW);
+ digitalWrite(motorPin4,LOW);
+ delay(5000);
+}
+
+
+
+
+void rotate_right(){
+ digitalWrite(motorPin3,LOW);
+ analogWrite(motorPin4,100);
+ digitalWrite(motorPin1,LOW);
+ analogWrite(motorPin2,230);
+ delay(1000);
+ digitalWrite(motorPin1,LOW);
+ digitalWrite(motorPin2,LOW);
+ digitalWrite(motorPin3,LOW);
+ digitalWrite(motorPin4,LOW);
+ delay(5000);
+}
+
+
+
+
+void rotate_in_place_right(){
+ analogWrite(motorPin3,100);
+ digitalWrite(motorPin4,LOW);
+ digitalWrite(motorPin1,LOW);
+ analogWrite(motorPin2,100);
+ delay(1000);
+ digitalWrite(motorPin1,LOW);
+ digitalWrite(motorPin2,LOW);
+ digitalWrite(motorPin3,LOW);
+ digitalWrite(motorPin4,LOW);
+ delay(5000);
+}
+
+
+
+
+void rotate_wide_left(){
+ digitalWrite(motorPin3,LOW);
+ analogWrite(motorPin4,230);
+ digitalWrite(motorPin1,LOW);
+ analogWrite(motorPin2,150);
+ delay(1000);
+ digitalWrite(motorPin1,LOW);
+ digitalWrite(motorPin2,LOW);
+ digitalWrite(motorPin3,LOW);
+ digitalWrite(motorPin4,LOW);
+ delay(5000);
+}
+
+
+
+
+void rotate_left(){
+ digitalWrite(motorPin3,LOW);
+ analogWrite(motorPin4,230);
+ digitalWrite(motorPin1,LOW);
+ analogWrite(motorPin2,100);
+ delay(1000);
+ digitalWrite(motorPin1,LOW);
+ digitalWrite(motorPin2,LOW);
+ digitalWrite(motorPin3,LOW);
+ digitalWrite(motorPin4,LOW);
+ delay(5000);
+}
+
+
+
+
+void rotate_in_place_left(){
+ digitalWrite(motorPin3,LOW);
+ analogWrite(motorPin4,230);
+ analogWrite(motorPin1,100);
+ digitalWrite(motorPin2,LOW);
+ delay(1000);
+ digitalWrite(motorPin1,LOW);
+ digitalWrite(motorPin2,LOW);
+ digitalWrite(motorPin3,LOW);
+ digitalWrite(motorPin4,LOW);
+ delay(5000);
+}
+
+
+void forward(){
+ analogWrite(motorPin4,150);
+ digitalWrite(motorPin3,LOW);
+ analogWrite(motorPin2,150);
+ digitalWrite(motorPin1,LOW);
+ delay(1000);
+ digitalWrite(motorPin1,LOW);
+ digitalWrite(motorPin2,LOW);
+ digitalWrite(motorPin3,LOW);
+ digitalWrite(motorPin4,LOW);
+ delay(5000);
+}
+
+
+void backward(){
+ analogWrite(motorPin3,150);
+ digitalWrite(motorPin4,LOW);
+ analogWrite(motorPin1,150);
+ digitalWrite(motorPin2,LOW);
+ delay(1000);
+ digitalWrite(motorPin1,LOW);
+ digitalWrite(motorPin2,LOW);
+ digitalWrite(motorPin3,LOW);
+ digitalWrite(motorPin4,LOW);
+ delay(5000);
+}
