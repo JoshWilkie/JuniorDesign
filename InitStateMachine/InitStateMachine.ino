@@ -9,6 +9,10 @@ const int motorPin4 = 9; // Pin 10 on L293
 volatile int currState = 0;
 volatile bool justChanged = false;
 
+// Debouncing variables
+volatile unsigned long lastDebounceTime = 0;
+const unsigned long debounceDelay = 250;  // 250 milliseconds debounce time
+
 // initialize digital pins for motors as an output.
 void forward();
 void backward();
@@ -84,12 +88,19 @@ void loop() {
   }
 
   if(!digitalRead(BUTTON_PIN)){
+    unsigned long currentTime = millis();
     if(justChanged){
       Serial.print("Button just read low\n");
     }
-    justChanged = false;
+    if ((currentTime - lastDebounceTime) > debounceDelay) {
+      // Only update change if debounce delay has passed
+      if(justChanged){
+        Serial.print("Updated just changed\n");
+      }
+      lastDebounceTime = currentTime;
+      justChanged = false;
+    }
   }
-
 }
 
 void cycleState() {
