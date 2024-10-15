@@ -11,6 +11,16 @@ const int rightBluePin = 0;
 const int rightRedPin = 0;
 const int rightPTPin = 0;
 
+static float leftBlackAmbient = 0.0;
+static float leftRedAmbient = 0.0;
+static float leftBlueAmbient = 0.0;
+static float leftYellowAmbient = 0.0;
+static float rightBlackAmbient = 0.0;
+static float rightRedAmbient = 0.0;
+static float rightBlueAmbient = 0.0;
+static float rightYellowAmbient = 0.0;
+
+
 // initialize digital pins for motors as an output.
 void forward();
 void backward();
@@ -22,6 +32,9 @@ void rotate_in_place_left();
 void rotate_in_place_right();
 void reset();
 void kill();
+
+float collectLight(int pin);
+void collectAmbient();
 
 void setup() {
   pinMode(leftBluePin, OUTPUT);
@@ -35,10 +48,12 @@ void setup() {
   pinMode(motorPin3, OUTPUT);
   pinMode(motorPin4, OUTPUT);
   Serial.begin(9600);
+  collectAmbient();
+  
 }
 
 void loop() {
-  
+
 }
 
 void kill(){
@@ -47,6 +62,35 @@ void kill(){
   // Serial.print(digitalRead(KILLSWITCH_PIN));
   // Serial.print("\n");
   reset();
+}
+
+void collectAmbient(){
+  delay(5000);
+  leftBlackAmbient = collectLight(leftPTPin);
+  rightBlackAmbient = collectLight(rightPTPin);
+  delay(5000);
+  leftBlueAmbient = collectLight(leftPTPin);
+  rightBlueAmbient = collectLight(rightPTPin);
+  delay(5000);
+  leftBlueAmbient = collectLight(leftPTPin);
+  rightBlueAmbient = collectLight(rightPTPin);
+  delay(5000);
+  leftYellowAmbient = collectLight(leftPTPin);
+  rightYellowAmbient = collectLight(rightPTPin);
+}
+
+float collectLight(int pin){
+  int totalRead = 0;
+  totalRead += analogRead(pin);
+  delay(50);
+  totalRead += analogRead(pin);
+  delay(50);
+  totalRead += analogRead(pin);
+  delay(50);
+  totalRead += analogRead(pin);
+  delay(50);
+  totalRead += analogRead(pin);
+  return (totalRead / 5.0);
 }
 
 void forward(){
