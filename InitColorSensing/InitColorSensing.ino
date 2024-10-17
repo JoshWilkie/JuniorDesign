@@ -9,7 +9,10 @@ const int leftRedPin = 0;
 const int leftPTPin = 0; // Analog in
 const int rightBluePin = 0;
 const int rightRedPin = 0;
-const int rightPTPin = 0;
+const int rightPTPin = 0; // Analog in
+
+const int battVoltPin = 5; // Analog in
+const int signifierLEDPin = 13;
 
 static float leftBlackAmbient = 0.0;
 static float leftRedAmbient = 0.0;
@@ -65,30 +68,72 @@ void kill(){
 }
 
 void collectAmbient(){
-  delay(5000);
+  blink();
+  blink();
+  digitalWrite(signifierLEDPin, HIGH);
   leftBlackAmbient = collectLight(leftPTPin);
   rightBlackAmbient = collectLight(rightPTPin);
-  delay(5000);
+  digitalWrite(signifierLEDPin, LOW);
+  blink();
+  digitalWrite(signifierLEDPin, HIGH);
   leftBlueAmbient = collectLight(leftPTPin);
   rightBlueAmbient = collectLight(rightPTPin);
-  delay(5000);
+  digitalWrite(signifierLEDPin, LOW);
+  blink();
+  digitalWrite(signifierLEDPin, HIGH);
   leftBlueAmbient = collectLight(leftPTPin);
   rightBlueAmbient = collectLight(rightPTPin);
-  delay(5000);
+  digitalWrite(signifierLEDPin, LOW);
+  blink();
+  digitalWrite(signifierLEDPin, HIGH);
   leftYellowAmbient = collectLight(leftPTPin);
   rightYellowAmbient = collectLight(rightPTPin);
+  digitalWrite(signifierLEDPin, LOW);
+}
+
+void blink(){
+  digitalWrite(signifierLEDPin, HIGH);
+  delay(300);
+  digitalWrite(signifierLEDPin, LOW);
+  delay(300);
+  digitalWrite(signifierLEDPin, HIGH);
+  delay(300);
+  digitalWrite(signifierLEDPin, LOW);
+  delay(300);
+  digitalWrite(signifierLEDPin, HIGH);
+  delay(300);
+  digitalWrite(signifierLEDPin, LOW);
+  delay(300);
+  digitalWrite(signifierLEDPin, HIGH);
+  delay(300);
+  digitalWrite(signifierLEDPin, LOW);
+  delay(300);
+  digitalWrite(signifierLEDPin, HIGH);
+  delay(300);
+  digitalWrite(signifierLEDPin, LOW);
+  delay(300);
 }
 
 float collectLight(int pin){
   int totalRead = 0;
   totalRead += analogRead(pin);
-  delay(50);
+  delay(100);
   totalRead += analogRead(pin);
-  delay(50);
+  delay(100);
   totalRead += analogRead(pin);
-  delay(50);
+  delay(100);
   totalRead += analogRead(pin);
-  delay(50);
+  delay(100);
+  totalRead += analogRead(pin);
+  delay(100);
+  totalRead += analogRead(pin);
+  delay(100);
+  totalRead += analogRead(pin);
+  delay(100);
+  totalRead += analogRead(pin);
+  delay(100);
+  totalRead += analogRead(pin);
+  delay(100);
   totalRead += analogRead(pin);
   return (totalRead / 5.0);
 }
