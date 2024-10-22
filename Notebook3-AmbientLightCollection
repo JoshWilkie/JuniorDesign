@@ -1,0 +1,26 @@
+void collectAmbient(){
+  blink();
+  blink();
+  digitalWrite(signifierLEDPin, HIGH);
+  leftBlackAmbient = collectLight(leftPTPin);
+  rightBlackAmbient = collectLight(rightPTPin);
+  digitalWrite(signifierLEDPin, LOW);
+
+  blink();
+  digitalWrite(signifierLEDPin, HIGH);
+  leftRedAmbient = collectLight(leftPTPin);
+  rightRedAmbient = collectLight(rightPTPin);
+  digitalWrite(signifierLEDPin, LOW);
+
+  blink();
+  digitalWrite(signifierLEDPin, HIGH);
+  leftBlueAmbient = collectLight(leftPTPin);
+  rightBlueAmbient = collectLight(rightPTPin);
+  digitalWrite(signifierLEDPin, LOW);
+
+  blink();
+  digitalWrite(signifierLEDPin, HIGH);
+  leftYellowAmbient = collectLight(leftPTPin);
+  rightYellowAmbient = collectLight(rightPTPin);
+  digitalWrite(signifierLEDPin, LOW);
+}
