@@ -73,21 +73,33 @@ void collectAmbient(){
   digitalWrite(signifierLEDPin, HIGH);
   leftBlackAmbient = collectLight(leftPTPin);
   rightBlackAmbient = collectLight(rightPTPin);
+  Serial.print("Black Ambient Light Read: ");
+  Serial.print(leftBlackAmbient);
+  Serial.print("\n");
+  digitalWrite(signifierLEDPin, LOW);
+  blink();
+  digitalWrite(signifierLEDPin, HIGH);
+  leftRedAmbient = collectLight(leftPTPin);
+  rightRedAmbient = collectLight(rightPTPin);
+  Serial.print("Red Ambient Light Read: ");
+  Serial.print(leftRedAmbient);
+  Serial.print("\n");
   digitalWrite(signifierLEDPin, LOW);
   blink();
   digitalWrite(signifierLEDPin, HIGH);
   leftBlueAmbient = collectLight(leftPTPin);
   rightBlueAmbient = collectLight(rightPTPin);
-  digitalWrite(signifierLEDPin, LOW);
-  blink();
-  digitalWrite(signifierLEDPin, HIGH);
-  leftBlueAmbient = collectLight(leftPTPin);
-  rightBlueAmbient = collectLight(rightPTPin);
+  Serial.print("Blue Ambient Light Read: ");
+  Serial.print(leftBlueAmbient);
+  Serial.print("\n");
   digitalWrite(signifierLEDPin, LOW);
   blink();
   digitalWrite(signifierLEDPin, HIGH);
   leftYellowAmbient = collectLight(leftPTPin);
   rightYellowAmbient = collectLight(rightPTPin);
+  Serial.print("Yellow Ambient Light Read: ");
+  Serial.print(leftYellowAmbient);
+  Serial.print("\n");
   digitalWrite(signifierLEDPin, LOW);
 }
 
