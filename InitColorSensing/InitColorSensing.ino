@@ -27,12 +27,12 @@ static float rightYellowAmbient = 0.0;
 // initialize digital pins for motors as an output.
 void forward();
 void backward();
-void rotate_left();
-void rotate_wide_left();
-void rotate_right();
-void rotate_wide_right();
-void rotate_in_place_left();
-void rotate_in_place_right();
+void turnLeft();
+void turnLeftWide();
+void turnRight();
+void turnRightWide();
+void rotateLeft();
+void rotateRight();
 void reset();
 void kill();
 
@@ -50,13 +50,57 @@ void setup() {
   pinMode(motorPin2, OUTPUT);
   pinMode(motorPin3, OUTPUT);
   pinMode(motorPin4, OUTPUT);
+  pinMode(battVoltPin, INPUT);
+  pinMode(signifierLEDPin, OUTPUT);
   Serial.begin(9600);
   collectAmbient();
   
 }
 
 void loop() {
+  // readLight();
+  if (true) {             // left and right PT read same color
 
+    // Go forward until color change or collision
+    // forward();
+
+    if (true) { // If left was just on a color and now both on black
+
+      // Turn right decent amount
+      // Go forward
+
+    } else if (false) {   // If right was just on color and now both on black
+
+      // Turn left decent amount
+      // Go forward
+
+    }
+
+  } else if (false) {     // left and right PT read diff colors
+    // Bot just turned onto or off of a color path
+
+    if (true) { // If was on all color before and left is now on black
+
+      // Turn right slightly
+      // Go forward
+
+    } else if (false) {   // If was on all color before and right is now on black
+
+      // Turn left slightly
+      // Go forward
+
+    }
+  } else if (false) {
+    
+  } else if (false) {
+    
+  } else if (false) {
+    
+  } else if (false) {
+    
+  } else if (false) {
+    
+  }
 }
 
 void kill(){
@@ -100,7 +144,7 @@ void collectAmbient(){
   Serial.print("Yellow Ambient Light Read: ");
   Serial.print(leftYellowAmbient);
   Serial.print("\n");
-  digitalWrite(signifierLEDPin, LOW);
+  // digitalWrite(signifierLEDPin, LOW);
 }
 
 void blink(){
@@ -166,7 +210,7 @@ void backward(){
   digitalWrite(motorPin2,LOW);
 }
 
-void rotate_left(){
+void turnLeft(){
   // Serial.print("In left\n");
   digitalWrite(motorPin3,LOW);
   analogWrite(motorPin4,230);
@@ -174,7 +218,7 @@ void rotate_left(){
   analogWrite(motorPin2,100);
 }
 
-void rotate_wide_left(){
+void turnLeftWide(){
   // Serial.print("In wide left\n");
   digitalWrite(motorPin3,LOW);
   analogWrite(motorPin4,230);
@@ -182,7 +226,7 @@ void rotate_wide_left(){
   analogWrite(motorPin2,150);
 }
 
-void rotate_right(){
+void turnRight(){
   // Serial.print("In right\n");
   digitalWrite(motorPin3,LOW);
   analogWrite(motorPin4,100);
@@ -190,7 +234,7 @@ void rotate_right(){
   analogWrite(motorPin2,230);
 }
 
-void rotate_wide_right(){
+void turnRightWide(){
   // Serial.print("In wide right\n");
   digitalWrite(motorPin3,LOW);
   analogWrite(motorPin4,150);
@@ -198,7 +242,7 @@ void rotate_wide_right(){
   analogWrite(motorPin2,230);
 }
 
-void rotate_in_place_left(){
+void rotateLeft(){
   // Serial.print("In in place left\n");
   digitalWrite(motorPin3,LOW);
   analogWrite(motorPin4,230);
@@ -206,7 +250,7 @@ void rotate_in_place_left(){
   digitalWrite(motorPin2,LOW);
 }
 
-void rotate_in_place_right(){
+void rotateRight(){
   // Serial.print("In in place right\n");
   analogWrite(motorPin3,100);
   digitalWrite(motorPin4,LOW);
