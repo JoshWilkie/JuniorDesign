@@ -1,7 +1,7 @@
-const int motorPin1 = 5; //Pin 7 on L293
-const int motorPin2 = 6; // Pin 2 on L293
-const int motorPin3 = 10; // Pin 15 on L293
-const int motorPin4 = 9; // Pin 10 on L293
+const int motorPin1 = 9; //Pin 9 on L293
+const int motorPin2 = 10; // Pin 15 on L293
+const int motorPin3 = 6; // Pin 2 on L293
+const int motorPin4 = 5; // Pin 7 on L293
 
 // TODO: Update pins to actual pins on Arduino
 const int leftBluePin = 0;
