@@ -3,10 +3,10 @@
 
 using namespace std;
 
-const int motorPin1 = 9; //Pin 9 on L293
-const int motorPin2 = 10; // Pin 15 on L293
-const int motorPin3 = 6; // Pin 2 on L293
-const int motorPin4 = 5; // Pin 7 on L293
+const int motorLeftBottom = 9; //Pin 9 on L293
+const int motorLeftTop = 10; // Pin 15 on L293
+const int motorRightBottom = 6; // Pin 2 on L293
+const int motorRightTop = 4; // Pin 7 on L293
 
 // TODO: Update pins to actual pins on Arduino
 const int leftBluePin = 0;
@@ -63,14 +63,17 @@ void setup() {
   pinMode(rightBluePin, OUTPUT);
   pinMode(rightRedPin, OUTPUT);
   pinMode(rightPTPin, INPUT);
-  pinMode(motorPin1, OUTPUT);
-  pinMode(motorPin2, OUTPUT);
-  pinMode(motorPin3, OUTPUT);
-  pinMode(motorPin4, OUTPUT);
+  pinMode(motorLeftBottom, OUTPUT);
+  pinMode(motorLeftTop, OUTPUT);
+  pinMode(motorRightBottom, OUTPUT);
+  pinMode(motorRightTop, OUTPUT);
   pinMode(battVoltPin, INPUT);
   pinMode(signifierLEDPin, OUTPUT);
+
+  reset();
+
   Serial.begin(9600);
-  collectAmbient();
+  // collectAmbient();
 
   // WiFi Setup //
   while (status != WL_CONNECTED) {
@@ -104,9 +107,64 @@ void loop() {
   if (messageSize > 0) {
     String message = client.readString();
     int strLength = message.length();
-    if(message.substring(strLength - 2) == "x4"){
+    if(message.substring(strLength - 4) == "Sizz"){
       Serial.println("Received a message:");
       Serial.println(message);
+      if(message.substring(strLength - 11) == "forwardSizz"){
+        // Serial.print("Calling forward\n");
+        // client.beginMessage(TYPE_TEXT);
+        // client.print("Calling forward");
+        // client.endMessage();
+        forward();
+      }else if(message.substring(strLength - 12) == "backwardSizz"){
+        // Serial.print("Calling backward\n");
+        // client.beginMessage(TYPE_TEXT);
+        // client.print("Calling backward");
+        // client.endMessage();
+        backward();
+      }else if(message.substring(strLength - 8) == "leftSizz"){
+        // Serial.print("Calling left\n");
+        // client.beginMessage(TYPE_TEXT);
+        // client.print("Calling left");
+        // client.endMessage();
+        turnLeft();
+      }else if(message.substring(strLength - 12) == "wideLeftSizz"){
+        // Serial.print("Calling wide left\n");
+        // client.beginMessage(TYPE_TEXT);
+        // client.print("Calling wide left");
+        // client.endMessage();
+        turnLeftWide();
+      }else if(message.substring(strLength - 9) == "rightSizz"){
+        // Serial.print("Calling right\n");
+        // client.beginMessage(TYPE_TEXT);
+        // client.print("Calling right");
+        // client.endMessage();
+        turnRight();
+      }else if(message.substring(strLength - 13) == "wideRightSizz"){
+        // Serial.print("Calling wide right\n");
+        // client.beginMessage(TYPE_TEXT);
+        // client.print("Calling wide right");
+        // client.endMessage();
+        turnRightWide();
+      }else if(message.substring(strLength - 14) == "rotateLeftSizz"){
+        // Serial.print("Calling in place left\n");
+        // client.beginMessage(TYPE_TEXT);
+        // client.print("Calling in place left");
+        // client.endMessage();
+        rotateLeft();
+      }else if(message.substring(strLength - 15) == "rotateRightSizz"){
+        // Serial.print("Calling in place right\n");
+        // client.beginMessage(TYPE_TEXT);
+        // client.print("Calling in place right");
+        // client.endMessage();
+        rotateRight();
+      }else if(message.substring(strLength - 9) == "resetSizz"){
+        // Serial.print("Calling reset\n");
+        // client.beginMessage(TYPE_TEXT);
+        // client.print("Calling reset");
+        // client.endMessage();
+        reset();
+      }
     }
   }
 
@@ -248,72 +306,72 @@ float collectLight(int pin){
 
 void forward(){
   // Serial.print("In forward\n");
-  analogWrite(motorPin4,150);
-  digitalWrite(motorPin3,LOW);
-  analogWrite(motorPin2,150);
-  digitalWrite(motorPin1,LOW);
+  analogWrite(motorRightTop,150);
+  digitalWrite(motorRightBottom,LOW);
+  analogWrite(motorLeftTop,150);
+  digitalWrite(motorLeftBottom,LOW);
 }
 
 void backward(){
   // Serial.print("In backward\n");
-  analogWrite(motorPin3,150);
-  digitalWrite(motorPin4,LOW);
-  analogWrite(motorPin1,150);
-  digitalWrite(motorPin2,LOW);
+  analogWrite(motorRightBottom,150);
+  digitalWrite(motorRightTop,LOW);
+  analogWrite(motorLeftBottom,150);
+  digitalWrite(motorLeftTop,LOW);
 }
 
 void turnLeft(){
   // Serial.print("In left\n");
-  digitalWrite(motorPin3,LOW);
-  analogWrite(motorPin4,230);
-  digitalWrite(motorPin1,LOW);
-  analogWrite(motorPin2,100);
+  digitalWrite(motorRightBottom,LOW);
+  analogWrite(motorRightTop,230);
+  digitalWrite(motorLeftBottom,LOW);
+  analogWrite(motorLeftTop,100);
 }
 
 void turnLeftWide(){
   // Serial.print("In wide left\n");
-  digitalWrite(motorPin3,LOW);
-  analogWrite(motorPin4,230);
-  digitalWrite(motorPin1,LOW);
-  analogWrite(motorPin2,150);
+  digitalWrite(motorRightBottom,LOW);
+  analogWrite(motorRightTop,230);
+  digitalWrite(motorLeftBottom,LOW);
+  analogWrite(motorLeftTop,150);
 }
 
 void turnRight(){
   // Serial.print("In right\n");
-  digitalWrite(motorPin3,LOW);
-  analogWrite(motorPin4,100);
-  digitalWrite(motorPin1,LOW);
-  analogWrite(motorPin2,230);
+  digitalWrite(motorRightBottom,LOW);
+  analogWrite(motorRightTop,100);
+  digitalWrite(motorLeftBottom,LOW);
+  analogWrite(motorLeftTop,230);
 }
 
 void turnRightWide(){
   // Serial.print("In wide right\n");
-  digitalWrite(motorPin3,LOW);
-  analogWrite(motorPin4,150);
-  digitalWrite(motorPin1,LOW);
-  analogWrite(motorPin2,230);
+  digitalWrite(motorRightBottom,LOW);
+  analogWrite(motorRightTop,150);
+  digitalWrite(motorLeftBottom,LOW);
+  analogWrite(motorLeftTop,230);
 }
 
 void rotateLeft(){
   // Serial.print("In in place left\n");
-  digitalWrite(motorPin3,LOW);
-  analogWrite(motorPin4,230);
-  analogWrite(motorPin1,100);
-  digitalWrite(motorPin2,LOW);
+  digitalWrite(motorRightBottom,LOW);
+  analogWrite(motorRightTop,230);
+  analogWrite(motorLeftBottom,100);
+  digitalWrite(motorLeftTop,LOW);
 }
 
 void rotateRight(){
   // Serial.print("In in place right\n");
-  analogWrite(motorPin3,100);
-  digitalWrite(motorPin4,LOW);
-  digitalWrite(motorPin1,LOW);
-  analogWrite(motorPin2,100);
+  analogWrite(motorRightBottom,100);
+  digitalWrite(motorRightTop,LOW);
+  digitalWrite(motorLeftBottom,LOW);
+  analogWrite(motorLeftTop,100);
 }
 
 void reset(){
   // Serial.print("In reset\n");
-  digitalWrite(motorPin1,LOW);
-  digitalWrite(motorPin2,LOW);
-  digitalWrite(motorPin3,LOW);
-  digitalWrite(motorPin4,LOW);
+  digitalWrite(motorLeftBottom,LOW);
+  digitalWrite(motorLeftTop,LOW);
+  digitalWrite(motorRightBottom,LOW);
+  digitalWrite(motorRightTop,LOW);
 }
