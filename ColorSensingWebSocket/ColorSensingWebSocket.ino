@@ -6,7 +6,7 @@ using namespace std;
 const int motorLeftBottom = 9; //Pin 9 on L293
 const int motorLeftTop = 10; // Pin 15 on L293
 const int motorRightBottom = 6; // Pin 2 on L293
-const int motorRightTop = 4; // Pin 7 on L293
+const int motorRightTop = 3; // Pin 7 on L293
 
 // TODO: Update pins to actual pins on Arduino
 const int leftBluePin = 0;
@@ -15,6 +15,12 @@ const int leftPTPin = 0; // Analog in
 const int rightBluePin = 0;
 const int rightRedPin = 0;
 const int rightPTPin = 0; // Analog in
+
+const int maxPower = 100;
+const int midPower = 70;
+const int minPower = 40;
+
+const int testingDelay = 1500;
 
 const int battVoltPin = 5; // Analog in
 const int signifierLEDPin = 13;
@@ -116,48 +122,64 @@ void loop() {
         // client.print("Calling forward");
         // client.endMessage();
         forward();
+        delay(testingDelay);
+        reset();
       }else if(message.substring(strLength - 12) == "backwardSizz"){
         // Serial.print("Calling backward\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling backward");
         // client.endMessage();
         backward();
+        delay(testingDelay);
+        reset();
       }else if(message.substring(strLength - 8) == "leftSizz"){
         // Serial.print("Calling left\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling left");
         // client.endMessage();
         turnLeft();
+        delay(testingDelay);
+        reset();
       }else if(message.substring(strLength - 12) == "wideLeftSizz"){
         // Serial.print("Calling wide left\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling wide left");
         // client.endMessage();
         turnLeftWide();
+        delay(testingDelay);
+        reset();
       }else if(message.substring(strLength - 9) == "rightSizz"){
         // Serial.print("Calling right\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling right");
         // client.endMessage();
         turnRight();
+        delay(testingDelay);
+        reset();
       }else if(message.substring(strLength - 13) == "wideRightSizz"){
         // Serial.print("Calling wide right\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling wide right");
         // client.endMessage();
         turnRightWide();
+        delay(testingDelay);
+        reset();
       }else if(message.substring(strLength - 14) == "rotateLeftSizz"){
         // Serial.print("Calling in place left\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling in place left");
         // client.endMessage();
         rotateLeft();
+        delay(testingDelay);
+        reset();
       }else if(message.substring(strLength - 15) == "rotateRightSizz"){
         // Serial.print("Calling in place right\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling in place right");
         // client.endMessage();
         rotateRight();
+        delay(testingDelay);
+        reset();
       }else if(message.substring(strLength - 9) == "resetSizz"){
         // Serial.print("Calling reset\n");
         // client.beginMessage(TYPE_TEXT);
@@ -306,66 +328,66 @@ float collectLight(int pin){
 
 void forward(){
   // Serial.print("In forward\n");
-  analogWrite(motorRightTop,150);
+  analogWrite(motorRightTop, maxPower);
   digitalWrite(motorRightBottom,LOW);
-  analogWrite(motorLeftTop,150);
+  analogWrite(motorLeftTop, maxPower);
   digitalWrite(motorLeftBottom,LOW);
 }
 
 void backward(){
   // Serial.print("In backward\n");
-  analogWrite(motorRightBottom,150);
+  analogWrite(motorRightBottom, maxPower);
   digitalWrite(motorRightTop,LOW);
-  analogWrite(motorLeftBottom,150);
+  analogWrite(motorLeftBottom, maxPower);
   digitalWrite(motorLeftTop,LOW);
 }
 
 void turnLeft(){
   // Serial.print("In left\n");
   digitalWrite(motorRightBottom,LOW);
-  analogWrite(motorRightTop,230);
+  analogWrite(motorRightTop, maxPower);
   digitalWrite(motorLeftBottom,LOW);
-  analogWrite(motorLeftTop,100);
+  analogWrite(motorLeftTop, minPower);
 }
 
 void turnLeftWide(){
   // Serial.print("In wide left\n");
   digitalWrite(motorRightBottom,LOW);
-  analogWrite(motorRightTop,230);
+  analogWrite(motorRightTop, maxPower);
   digitalWrite(motorLeftBottom,LOW);
-  analogWrite(motorLeftTop,150);
+  analogWrite(motorLeftTop, midPower);
 }
 
 void turnRight(){
   // Serial.print("In right\n");
   digitalWrite(motorRightBottom,LOW);
-  analogWrite(motorRightTop,100);
+  analogWrite(motorRightTop, minPower);
   digitalWrite(motorLeftBottom,LOW);
-  analogWrite(motorLeftTop,230);
+  analogWrite(motorLeftTop, maxPower);
 }
 
 void turnRightWide(){
   // Serial.print("In wide right\n");
   digitalWrite(motorRightBottom,LOW);
-  analogWrite(motorRightTop,150);
+  analogWrite(motorRightTop, midPower);
   digitalWrite(motorLeftBottom,LOW);
-  analogWrite(motorLeftTop,230);
+  analogWrite(motorLeftTop, maxPower);
 }
 
 void rotateLeft(){
   // Serial.print("In in place left\n");
   digitalWrite(motorRightBottom,LOW);
-  analogWrite(motorRightTop,230);
-  analogWrite(motorLeftBottom,100);
+  analogWrite(motorRightTop, midPower);
+  analogWrite(motorLeftBottom, midPower);
   digitalWrite(motorLeftTop,LOW);
 }
 
 void rotateRight(){
   // Serial.print("In in place right\n");
-  analogWrite(motorRightBottom,100);
+  analogWrite(motorRightBottom, midPower);
   digitalWrite(motorRightTop,LOW);
   digitalWrite(motorLeftBottom,LOW);
-  analogWrite(motorLeftTop,100);
+  analogWrite(motorLeftTop, midPower);
 }
 
 void reset(){
