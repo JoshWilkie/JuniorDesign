@@ -23,16 +23,35 @@ const int minPower = 40;
 const int testingDelay = 1500;
 
 const int battVoltPin = 5; // Analog in
-const int signifierLEDPin = 13;
 
-static float leftBlackAmbient = 0.0;
-static float leftRedAmbient = 0.0;
-static float leftBlueAmbient = 0.0;
-static float leftYellowAmbient = 0.0;
-static float rightBlackAmbient = 0.0;
-static float rightRedAmbient = 0.0;
-static float rightBlueAmbient = 0.0;
-static float rightYellowAmbient = 0.0;
+static float blackAmbient = 0.0;
+static float redAmbient = 0.0;
+static float blueAmbient = 0.0;
+static float yellowAmbient = 0.0;
+
+// TODO - Find actual min max values
+static float blackBMax = 100.0;
+static float blackBMin = 50.0;
+static float blackRMax = 100.0;
+static float blackRMin = 50.0;
+static float redBMax = 100.0;
+static float redBMin = 50.0;
+static float redRMax = 100.0;
+static float redRMin = 50.0;
+static float blueBMax = 100.0;
+static float blueBMin = 50.0;
+static float blueRMax = 100.0;
+static float blueRMin = 50.0;
+static float yellowBMax = 100.0;
+static float yellowBMin = 50.0;
+static float yellowRMax = 100.0;
+static float yellowRMin = 50.0;
+
+const int IROutputPin = 0;
+const int IRInputPin = 0; // Analog in
+
+static float wallDetectionVal = 0.0;
+static float wallThreshold = 0.0;
 
 // Websocket Settings //
 char ssid[] = "tufts_eecs";
@@ -57,7 +76,9 @@ void turnRightWide();
 void rotateLeft();
 void rotateRight();
 void reset();
-void kill();
+
+void soloDemo();
+void teamDemo();
 
 float collectLight(int pin);
 void collectAmbient();
@@ -74,12 +95,11 @@ void setup() {
   pinMode(motorRightBottom, OUTPUT);
   pinMode(motorRightTop, OUTPUT);
   pinMode(battVoltPin, INPUT);
-  pinMode(signifierLEDPin, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   reset();
 
   Serial.begin(9600);
-  // collectAmbient();
 
   // WiFi Setup //
   while (status != WL_CONNECTED) {
@@ -107,8 +127,6 @@ void setup() {
 }
 
 void loop() {
-  // readLight();
-
   int messageSize = client.parseMessage();
   if (messageSize > 0) {
     String message = client.readString();
@@ -186,119 +204,144 @@ void loop() {
         // client.print("Calling reset");
         // client.endMessage();
         reset();
+      }else if(message.substring(strLength - 15) == "soloDemoSizz"){
+        soloDemo();
+      }else if(message.substring(strLength - 15) == "teamDemoSizz"){
+        teamDemo();
+      }else if(message.substring(strLength - 11) == "ambientSizz"){
+        collectAmbient();
       }
     }
   }
 
-  if (true) {             // left and right PT read same color
-
-    // Go forward until color change or collision
-    // forward();
-
-    if (true) { // If left was just on a color and now both on black
-
-      // Turn right decent amount
-      // Go forward
-
-    } else if (false) {   // If right was just on color and now both on black
-
-      // Turn left decent amount
-      // Go forward
-
-    }
-
-  } else if (false) {     // left and right PT read diff colors
-    // Bot just turned onto or off of a color path
-
-    if (true) { // If was on all color before and left is now on black
-
-      // Turn right slightly
-      // Go forward
-
-    } else if (false) {   // If was on all color before and right is now on black
-
-      // Turn left slightly
-      // Go forward
-
-    }
-  } else if (false) {
-    
-  } else if (false) {
-    
-  } else if (false) {
-    
-  } else if (false) {
-    
-  } else if (false) {
-    
-  }
   delay(10);
 }
 
-void kill(){
-  // Serial.print("In kill\n");
-  // Serial.print("Kill Button Read: ");
-  // Serial.print(digitalRead(KILLSWITCH_PIN));
-  // Serial.print("\n");
+void soloDemo(){
+  // Go forward until reaching wall
+  forward();
+  while(wallDetectionVal < wallThreshold){
+    wallDetectionVal = analogRead(IRInputPin);
+    delay(10);
+  }
+
+  // Spin in place then go back towards where we started
   reset();
+  delay(300);
+  rotateRight();
+  delay(1500);
+  reset();
+  forward();
+
+  int leftColorID = 0;
+  int rightColorID = 0;
+  while(rightColorID != 2){
+    rightColorID = getColor(1);
+  }
+}
+
+void teamDemo(){
+  delay(10);
+}
+
+int getColor(int side){
+  int bluePin = 0;
+  int redPin = 0;
+  int PTPin = 0;
+  if(side == 0){
+    bluePin = leftBluePin;
+    redPin  = leftRedPin;
+    PTPin   = leftPTPin;
+  }else{
+    bluePin = rightBluePin;
+    redPin  = rightRedPin;
+    PTPin   = rightPTPin;
+  }
+  
+  digitalWrite(bluePin, HIGH);
+  digitalWrite(redPin, LOW);
+  delay(5);
+  float blueReading = analogRead(PTPin);
+  delay(5);
+  digitalWrite(bluePin, LOW);
+  digitalWrite(redPin, HIGH);
+  delay(5);
+  float redReading = analogRead(PTPin);
+  delay(5);
+  digitalWrite(bluePin, HIGH);
+  digitalWrite(redPin, HIGH);
+  delay(5);
+  float bothReading = analogRead(PTPin);
+  delay(5);
+  digitalWrite(bluePin, LOW);
+  digitalWrite(redPin, HIGH);
+  delay(5);
+  float offReading = analogRead(PTPin);
+  delay(5);
+
+  if((blueReading - blackAmbient) < blackBMax && (blueReading - blackAmbient) > blackBMin && (redReading - blackAmbient) < blackRMax && (redReading - blackAmbient) > blackRMin){
+    return 1;
+  }else if((blueReading - redAmbient) < redBMax && (blueReading - redAmbient) > redBMin && (redReading - redAmbient) < redRMax && (redReading - redAmbient) > redRMin){
+    return 2;
+  }else if((blueReading - blueAmbient) < blueBMax && (blueReading - blueAmbient) > blueBMin && (redReading - blueAmbient) < blueRMax && (redReading - blueAmbient) > blueRMin){
+    return 3;
+  }else if((blueReading - yellowAmbient) < yellowBMax && (blueReading - yellowAmbient) > yellowBMin && (redReading - yellowAmbient) < yellowRMax && (redReading - yellowAmbient) > yellowRMin){
+    return 4;
+  }
 }
 
 void collectAmbient(){
   blink();
   blink();
-  digitalWrite(signifierLEDPin, HIGH);
-  leftBlackAmbient = collectLight(leftPTPin);
-  rightBlackAmbient = collectLight(rightPTPin);
+  digitalWrite(LED_BUILTIN, HIGH);
+  blackAmbient = collectLight(leftPTPin);
   Serial.print("Black Ambient Light Read: ");
-  Serial.print(leftBlackAmbient);
+  Serial.print(blackAmbient);
   Serial.print("\n");
-  digitalWrite(signifierLEDPin, LOW);
+  digitalWrite(LED_BUILTIN, LOW);
   blink();
-  digitalWrite(signifierLEDPin, HIGH);
-  leftRedAmbient = collectLight(leftPTPin);
-  rightRedAmbient = collectLight(rightPTPin);
+  digitalWrite(LED_BUILTIN, HIGH);
+  redAmbient = collectLight(leftPTPin);
   Serial.print("Red Ambient Light Read: ");
-  Serial.print(leftRedAmbient);
+  Serial.print(redAmbient);
   Serial.print("\n");
-  digitalWrite(signifierLEDPin, LOW);
+  digitalWrite(LED_BUILTIN, LOW);
   blink();
-  digitalWrite(signifierLEDPin, HIGH);
-  leftBlueAmbient = collectLight(leftPTPin);
-  rightBlueAmbient = collectLight(rightPTPin);
+  digitalWrite(LED_BUILTIN, HIGH);
+  blueAmbient = collectLight(leftPTPin);
   Serial.print("Blue Ambient Light Read: ");
-  Serial.print(leftBlueAmbient);
+  Serial.print(blueAmbient);
   Serial.print("\n");
-  digitalWrite(signifierLEDPin, LOW);
+  digitalWrite(LED_BUILTIN, LOW);
   blink();
-  digitalWrite(signifierLEDPin, HIGH);
-  leftYellowAmbient = collectLight(leftPTPin);
-  rightYellowAmbient = collectLight(rightPTPin);
+  digitalWrite(LED_BUILTIN, HIGH);
+  yellowAmbient = collectLight(leftPTPin);
   Serial.print("Yellow Ambient Light Read: ");
-  Serial.print(leftYellowAmbient);
+  Serial.print(yellowAmbient);
   Serial.print("\n");
-  // digitalWrite(signifierLEDPin, LOW);
+  // digitalWrite(LED_BUILTIN, LOW);
 }
 
 void blink(){
-  digitalWrite(signifierLEDPin, HIGH);
+  digitalWrite(LED_BUILTIN, HIGH);
   delay(300);
-  digitalWrite(signifierLEDPin, LOW);
+  digitalWrite(LED_BUILTIN, LOW);
   delay(300);
-  digitalWrite(signifierLEDPin, HIGH);
+  digitalWrite(LED_BUILTIN, HIGH);
   delay(300);
-  digitalWrite(signifierLEDPin, LOW);
+  digitalWrite(LED_BUILTIN, LOW);
   delay(300);
-  digitalWrite(signifierLEDPin, HIGH);
+  digitalWrite(LED_BUILTIN, HIGH);
   delay(300);
-  digitalWrite(signifierLEDPin, LOW);
+  digitalWrite(LED_BUILTIN, LOW);
   delay(300);
-  digitalWrite(signifierLEDPin, HIGH);
+  digitalWrite(LED_BUILTIN, HIGH);
   delay(300);
-  digitalWrite(signifierLEDPin, LOW);
+  digitalWrite(LED_BUILTIN, LOW);
   delay(300);
-  digitalWrite(signifierLEDPin, HIGH);
+  digitalWrite(LED_BUILTIN, HIGH);
   delay(300);
-  digitalWrite(signifierLEDPin, LOW);
+  digitalWrite(LED_BUILTIN, LOW);
   delay(300);
 }
 
@@ -323,7 +366,7 @@ float collectLight(int pin){
   totalRead += analogRead(pin);
   delay(100);
   totalRead += analogRead(pin);
-  return (totalRead / 5.0);
+  return (totalRead / 10.0);
 }
 
 void forward(){
