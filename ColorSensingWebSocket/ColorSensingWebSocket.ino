@@ -132,11 +132,10 @@ void loop() {
   int messageSize = client.parseMessage();
   if (messageSize > 0) {
     String message = client.readString();
-    int strLength = message.length();
-    if(message.substring(strLength - 4) == "Sizz"){
+    if(message.endsWith("Sizz")){
       Serial.println("Received a message:");
       Serial.println(message);
-      if(message.substring(strLength - 11) == "forwardSizz"){
+      if(message.endsWith("forwardSizz")){
         // Serial.print("Calling forward\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling forward");
@@ -144,7 +143,7 @@ void loop() {
         forward();
         delay(testingDelay);
         reset();
-      }else if(message.substring(strLength - 12) == "backwardSizz"){
+      }else if(message.endsWith("backwardSizz")){
         // Serial.print("Calling backward\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling backward");
@@ -152,7 +151,7 @@ void loop() {
         backward();
         delay(testingDelay);
         reset();
-      }else if(message.substring(strLength - 8) == "leftSizz"){
+      }else if(message.endsWith("leftSizz")){
         // Serial.print("Calling left\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling left");
@@ -160,7 +159,7 @@ void loop() {
         turnLeft();
         delay(testingDelay);
         reset();
-      }else if(message.substring(strLength - 12) == "wideLeftSizz"){
+      }else if(message.endsWith("wideLeftSizz")){
         // Serial.print("Calling wide left\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling wide left");
@@ -168,7 +167,7 @@ void loop() {
         turnLeftWide();
         delay(testingDelay);
         reset();
-      }else if(message.substring(strLength - 9) == "rightSizz"){
+      }else if(message.endsWith("rightSizz")){
         // Serial.print("Calling right\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling right");
@@ -176,7 +175,7 @@ void loop() {
         turnRight();
         delay(testingDelay);
         reset();
-      }else if(message.substring(strLength - 13) == "wideRightSizz"){
+      }else if(message.endsWith("wideRightSizz")){
         // Serial.print("Calling wide right\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling wide right");
@@ -184,7 +183,7 @@ void loop() {
         turnRightWide();
         delay(testingDelay);
         reset();
-      }else if(message.substring(strLength - 14) == "rotateLeftSizz"){
+      }else if(message.endsWith("rotateLeftSizz")){
         // Serial.print("Calling in place left\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling in place left");
@@ -192,7 +191,7 @@ void loop() {
         rotateLeft();
         delay(testingDelay);
         reset();
-      }else if(message.substring(strLength - 15) == "rotateRightSizz"){
+      }else if(message.endsWith("rotateRightSizz")){
         // Serial.print("Calling in place right\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling in place right");
@@ -200,19 +199,19 @@ void loop() {
         rotateRight();
         delay(testingDelay);
         reset();
-      }else if(message.substring(strLength - 9) == "resetSizz"){
+      }else if(message.endsWith("resetSizz")){
         // Serial.print("Calling reset\n");
         // client.beginMessage(TYPE_TEXT);
         // client.print("Calling reset");
         // client.endMessage();
         reset();
-      }else if(message.substring(strLength - 15) == "soloDemoSizz"){
+      }else if(message.endsWith("soloDemoSizz")){
         soloDemo();
-      }else if(message.substring(strLength - 15) == "teamDemoSizz"){
+      }else if(message.endsWith("redDemoSizz")){
         teamDemoRed();
-      }else if(message.substring(strLength - 15) == "teamDemoSizz"){
+      }else if(message.endsWith("blueDemoSizz")){
         teamDemoBlue();
-      }else if(message.substring(strLength - 11) == "ambientSizz"){
+      }else if(message.endsWith("ambientSizz")){
         collectAmbient();
       }
     }
@@ -292,6 +291,7 @@ void soloDemo(){
   delay(200);
   forward();
 
+  wallDetectionVal = analogRead(IRInputPin);
   // Go forward until wall
   while(wallDetectionVal < wallThreshold){
     wallDetectionVal = analogRead(IRInputPin);
@@ -325,11 +325,224 @@ void followColor(int targetColorID){
 }
 
 void teamDemoRed(){
-  delay(10);
+  // Go forward until reaching wall
+  forward();
+  float wallDetectionVal = 0;
+  while(wallDetectionVal < wallThreshold){
+    wallDetectionVal = analogRead(IRInputPin);
+    delay(10);
+  }
+
+  // Spin in place then go back towards where we started
+  reset();
+  delay(200);
+  rotateRight();
+  delay(1500);
+  reset();
+  delay(200);
+  forward();
+
+  // Go forward until we reach red
+  int leftColorID = 0;
+  int rightColorID = 0;
+  while(rightColorID != 2){
+    rightColorID = getColor(1);
+  }
+
+  reset();
+  delay(200);
+  rotateLeft();
+  delay(800);
+  reset();
+  delay(200);
+
+  // Send message to companion bot that we found our line
+  client.beginMessage(TYPE_TEXT);
+  client.print("foundRedSizz");
+  client.endMessage();
+
+  // Follow red
+  followColor(2);
+
+  // Spin in place then go towards yellow line
+  reset();
+  delay(200);
+  rotateLeft();
+  delay(800);
+  reset();
+  delay(200);
+  forward();
+
+  // Go forward until we reach yellow
+  leftColorID = 0;
+  rightColorID = 0;
+  while(rightColorID != 4){
+    rightColorID = getColor(1);
+  }
+
+  // Turn towards yellow line
+  reset();
+  delay(200);
+  rotateLeft();
+  delay(800);
+  reset();
+  delay(200);
+
+  String message = "";
+  while(!message.endsWith("foundBlueSizz")){
+    int messageSize = client.parseMessage();
+    if (messageSize > 0) {
+      String message = client.readString();
+    }
+  }
+
+  client.beginMessage(TYPE_TEXT);
+  client.print("acknowledgedSizz");
+  client.endMessage();
+
+  // Follow yellow
+  followColor(4);
+
+  // Turn towards original position
+  reset();
+  delay(200);
+  rotateLeft();
+  delay(800);
+  reset();
+  delay(200);
+  forward();
+
+  wallDetectionVal = analogRead(IRInputPin);
+  // Go forward until wall
+  while(wallDetectionVal < wallThreshold){
+    wallDetectionVal = analogRead(IRInputPin);
+    delay(10);
+  }
+
+  // Now back where we started
+  reset();
+
+  client.beginMessage(TYPE_TEXT);
+  client.print("bot1ReturnedSizz");
+  client.endMessage();
+
+  while(!message.endsWith("bot2ReturnedSizz")){
+    int messageSize = client.parseMessage();
+    if (messageSize > 0) {
+      String message = client.readString();
+    }
+  }
+
+  client.beginMessage(TYPE_TEXT);
+  client.print("acknowledgedSizz");
+  client.endMessage();
 }
 
 void teamDemoBlue(){
-  delay(10);
+  // Wait for companion bot to find red
+  String message = "";
+  while(!message.endsWith("foundRedSizz")){
+    int messageSize = client.parseMessage();
+    if (messageSize > 0) {
+      String message = client.readString();
+    }
+  }
+
+  // Go forward until reaching wall
+  forward();
+  float wallDetectionVal = 0;
+  while(wallDetectionVal < wallThreshold){
+    wallDetectionVal = analogRead(IRInputPin);
+    delay(10);
+  }
+
+  // Spin in place then go back towards where we started
+  reset();
+  delay(200);
+  rotateLeft();
+  delay(1500);
+  reset();
+  delay(200);
+  forward();
+
+  // Go forward until we reach blue
+  int leftColorID = 0;
+  int rightColorID = 0;
+  while(leftColorID != 3){
+    leftColorID = getColor(1);
+  }
+
+  reset();
+  delay(200);
+  rotateRight();
+  delay(800);
+  reset();
+  delay(200);
+
+  // Send message to companion bot that we found our line
+  client.beginMessage(TYPE_TEXT);
+  client.print("foundBlueSizz");
+  client.endMessage();
+
+  // Follow blue
+  followColor(3);
+
+  // Spin in place then go towards yellow line
+  reset();
+  delay(200);
+  rotateRight();
+  delay(800);
+  reset();
+  delay(200);
+  forward();
+
+  // Go forward until we reach yellow
+  leftColorID = 0;
+  rightColorID = 0;
+  while(leftColorID != 4){
+    leftColorID = getColor(1);
+  }
+
+  // Turn towards yellow line
+  reset();
+  delay(200);
+  rotateRight();
+  delay(800);
+  reset();
+  delay(200);
+
+  while(!message.endsWith("bot1ReturnedSizz")){
+    int messageSize = client.parseMessage();
+    if (messageSize > 0) {
+      String message = client.readString();
+    }
+  }
+
+  // Follow yellow
+  followColor(4);
+
+  // Turn towards original position
+  reset();
+  delay(200);
+  rotateRight();
+  delay(800);
+  reset();
+  delay(200);
+  forward();
+
+  wallDetectionVal = analogRead(IRInputPin);
+  // Go forward until wall
+  while(wallDetectionVal < wallThreshold){
+    wallDetectionVal = analogRead(IRInputPin);
+    delay(10);
+  }
+
+  // Now back where we started
+  reset();
+
+  client.beginMessage(TYPE_TEXT);
+  client.print("bot2ReturnedSizz");
+  client.endMessage();
 }
 
 int getColor(int side){
