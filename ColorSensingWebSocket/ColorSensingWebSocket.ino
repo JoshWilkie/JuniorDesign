@@ -50,8 +50,7 @@ static float yellowRMin = 50.0;
 const int IROutputPin = 0;
 const int IRInputPin = 0; // Analog in
 
-static float wallDetectionVal = 0.0;
-static float wallThreshold = 0.0;
+static float wallThreshold = 100.0;
 
 // Websocket Settings //
 char ssid[] = "tufts_eecs";
@@ -78,7 +77,10 @@ void rotateRight();
 void reset();
 
 void soloDemo();
-void teamDemo();
+void teamDemoRed();
+void teamDemoBlue();
+
+void followColor(int targetColorID);
 
 float collectLight(int pin);
 void collectAmbient();
@@ -207,7 +209,9 @@ void loop() {
       }else if(message.substring(strLength - 15) == "soloDemoSizz"){
         soloDemo();
       }else if(message.substring(strLength - 15) == "teamDemoSizz"){
-        teamDemo();
+        teamDemoRed();
+      }else if(message.substring(strLength - 15) == "teamDemoSizz"){
+        teamDemoBlue();
       }else if(message.substring(strLength - 11) == "ambientSizz"){
         collectAmbient();
       }
@@ -220,6 +224,7 @@ void loop() {
 void soloDemo(){
   // Go forward until reaching wall
   forward();
+  float wallDetectionVal = 0;
   while(wallDetectionVal < wallThreshold){
     wallDetectionVal = analogRead(IRInputPin);
     delay(10);
@@ -227,20 +232,83 @@ void soloDemo(){
 
   // Spin in place then go back towards where we started
   reset();
-  delay(300);
+  delay(200);
   rotateRight();
   delay(1500);
   reset();
+  delay(200);
   forward();
 
+  // Go forward until we reach red
   int leftColorID = 0;
   int rightColorID = 0;
   while(rightColorID != 2){
     rightColorID = getColor(1);
   }
+
+  reset();
+  delay(200);
+  rotateLeft();
+  delay(800);
+  reset();
+  delay(200);
+
+  // Follow red
+  followColor(2);
+
+  // Spin in place then go towards yellow line
+  reset();
+  delay(200);
+  rotateLeft();
+  delay(800);
+  reset();
+  delay(200);
+  forward();
+
+  // Go forward until we reach yellow
+  leftColorID = 0;
+  rightColorID = 0;
+  while(rightColorID != 4){
+    rightColorID = getColor(1);
+  }
+
+  reset();
+  delay(200);
+  rotateLeft();
+  delay(800);
+  reset();
+  delay(200);
+
+  
 }
 
-void teamDemo(){
+void followColor(int targetColorID){
+  // Follow
+  while(wallDetectionVal < wallThreshold){
+    leftColorID = getColor(0);
+    rightColorID = getColor(1);
+    // Went too far right
+    if(leftColorID = targetColorID){
+      turnLeft();
+      delay(100);
+      forward();
+    }
+    // Went too far left
+    if(rightColorID != targetColorID){
+      turnRight();
+      delay(100);
+      forward();
+    }
+    wallDetectionVal = analogRead(IRInputPin);
+    delay(10);
+  }
+}
+
+void teamDemoRed(){
+  delay(10);
+}
+
+void teamDemoBlue(){
   delay(10);
 }
 
@@ -257,36 +325,28 @@ int getColor(int side){
     redPin  = rightRedPin;
     PTPin   = rightPTPin;
   }
-  
+  int colorDelay = 10;
   digitalWrite(bluePin, HIGH);
   digitalWrite(redPin, LOW);
-  delay(5);
+  delay(colorDelay);
   float blueReading = analogRead(PTPin);
-  delay(5);
+  delay(colorDelay);
   digitalWrite(bluePin, LOW);
   digitalWrite(redPin, HIGH);
-  delay(5);
+  delay(colorDelay);
   float redReading = analogRead(PTPin);
-  delay(5);
-  digitalWrite(bluePin, HIGH);
-  digitalWrite(redPin, HIGH);
-  delay(5);
-  float bothReading = analogRead(PTPin);
-  delay(5);
+  delay(colorDelay);
   digitalWrite(bluePin, LOW);
-  digitalWrite(redPin, HIGH);
-  delay(5);
-  float offReading = analogRead(PTPin);
-  delay(5);
+  digitalWrite(redPin, LOW);
 
   if((blueReading - blackAmbient) < blackBMax && (blueReading - blackAmbient) > blackBMin && (redReading - blackAmbient) < blackRMax && (redReading - blackAmbient) > blackRMin){
-    return 1;
+    return 1; // Reads Black
   }else if((blueReading - redAmbient) < redBMax && (blueReading - redAmbient) > redBMin && (redReading - redAmbient) < redRMax && (redReading - redAmbient) > redRMin){
-    return 2;
+    return 2; // Reads Red
   }else if((blueReading - blueAmbient) < blueBMax && (blueReading - blueAmbient) > blueBMin && (redReading - blueAmbient) < blueRMax && (redReading - blueAmbient) > blueRMin){
-    return 3;
+    return 3; // Reads Blue
   }else if((blueReading - yellowAmbient) < yellowBMax && (blueReading - yellowAmbient) > yellowBMin && (redReading - yellowAmbient) < yellowRMax && (redReading - yellowAmbient) > yellowRMin){
-    return 4;
+    return 4; // Reads Yellow
   }
 }
 
