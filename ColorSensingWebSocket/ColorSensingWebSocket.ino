@@ -272,6 +272,7 @@ void soloDemo(){
     rightColorID = getColor(1);
   }
 
+  // Turn towards yellow line
   reset();
   delay(200);
   rotateLeft();
@@ -279,7 +280,26 @@ void soloDemo(){
   reset();
   delay(200);
 
-  
+  // Follow yellow
+  followColor(4);
+
+  // Turn towards original position
+  reset();
+  delay(200);
+  rotateLeft();
+  delay(800);
+  reset();
+  delay(200);
+  forward();
+
+  // Go forward until wall
+  while(wallDetectionVal < wallThreshold){
+    wallDetectionVal = analogRead(IRInputPin);
+    delay(10);
+  }
+
+  // Now back where we started
+  reset();
 }
 
 void followColor(int targetColorID){
