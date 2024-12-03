@@ -302,28 +302,6 @@ void soloDemo(){
   reset();
 }
 
-void followColor(int targetColorID){
-  // Follow
-  while(wallDetectionVal < wallThreshold){
-    leftColorID = getColor(0);
-    rightColorID = getColor(1);
-    // Went too far right
-    if(leftColorID = targetColorID){
-      turnLeft();
-      delay(100);
-      forward();
-    }
-    // Went too far left
-    if(rightColorID != targetColorID){
-      turnRight();
-      delay(100);
-      forward();
-    }
-    wallDetectionVal = analogRead(IRInputPin);
-    delay(10);
-  }
-}
-
 void teamDemoRed(){
   // Go forward until reaching wall
   forward();
@@ -558,7 +536,7 @@ int getColor(int side){
     redPin  = rightRedPin;
     PTPin   = rightPTPin;
   }
-  int colorDelay = 10;
+  int colorDelay = 12;
   digitalWrite(bluePin, HIGH);
   digitalWrite(redPin, LOW);
   delay(colorDelay);
@@ -580,6 +558,27 @@ int getColor(int side){
     return 3; // Reads Blue
   }else if((blueReading - yellowAmbient) < yellowBMax && (blueReading - yellowAmbient) > yellowBMin && (redReading - yellowAmbient) < yellowRMax && (redReading - yellowAmbient) > yellowRMin){
     return 4; // Reads Yellow
+  }
+}
+
+void followColor(int targetColorID){
+  // Follow
+  while(wallDetectionVal < wallThreshold){
+    leftColorID = getColor(0);
+    rightColorID = getColor(1);
+    // Went too far right
+    if(leftColorID = targetColorID){
+      turnLeft();
+      delay(100);
+      forward();
+    }
+    // Went too far left
+    if(rightColorID != targetColorID){
+      turnRight();
+      delay(100);
+      forward();
+    }
+    wallDetectionVal = analogRead(IRInputPin);
   }
 }
 
