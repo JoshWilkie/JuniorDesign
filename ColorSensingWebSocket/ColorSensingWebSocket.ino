@@ -1,5 +1,9 @@
 #include <ArduinoHttpClient.h>
 #include <WiFi.h>
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 using namespace std;
 
@@ -22,7 +26,7 @@ const int minPower = 40;
 
 const int testingDelay = 1500;
 
-const int battVoltPin = 5; // Analog in
+// const int battVoltPin = 5; // Analog in
 
 float blackAmbient = 0.0;
 float redAmbient = 0.0;
@@ -48,9 +52,9 @@ float yellowRMax = 100.0;
 float yellowRMin = 50.0;
 
 const int IROutputPin = 0;
-const int IRInputPin = 0; // Analog in
+const int IRInputPin = 5; // Analog in
 
-const float wallThreshold = 100.0;
+const float wallThreshold = 800.0;
 
 // Websocket Settings //
 char ssid[] = "tufts_eecs";
@@ -64,6 +68,13 @@ WebSocketClient client = WebSocketClient(wifi, serverAddress, port);
 String clientID = "828BD9E1B7C7"; //Insert your Server ID Here!
 int status = WL_IDLE_STATUS;
 
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+
+// Declaration for SSD1306 display connected using I2C
+#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SCREEN_ADDRESS 0x3C
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // initialize digital pins for motors as an output.
 void forward();
@@ -85,6 +96,8 @@ void followColor(int targetColorID);
 float collectLight(int pin);
 void collectAmbient();
 
+void printToScreen(String text);
+
 void setup() {
   pinMode(leftBluePin, OUTPUT);
   pinMode(leftRedPin, OUTPUT);
@@ -96,7 +109,7 @@ void setup() {
   pinMode(motorLeftTop, OUTPUT);
   pinMode(motorRightBottom, OUTPUT);
   pinMode(motorRightTop, OUTPUT);
-  pinMode(battVoltPin, INPUT);
+  // pinMode(battVoltPin, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
   reset();
@@ -126,6 +139,22 @@ void setup() {
   client.beginMessage(TYPE_TEXT);
   client.print(clientID);
   client.endMessage();
+
+  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;); // Don't proceed, loop forever
+  }
+
+  // Clear the buffer.
+  display.clearDisplay();
+
+  // Display Text
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(32,28);
+  display.println("Hello World!");
+  display.display();
+  analogWrite(5, 171);
 }
 
 void loop() {
@@ -213,29 +242,46 @@ void loop() {
         teamDemoBlue();
       }else if(message.endsWith("ambientSizz")){
         collectAmbient();
+      }else if(message.endsWith("displayTestSizz")){
+        printToScreen("Waiting", "For", "Companion");
+      // }else if(message.endsWith("IRTestSizz")){
+      //   while(true){
+      //     delay(250);
+      //     float irRead;
+      //     irRead = analogRead(IRInputPin);
+      //     Serial.print("\nRead in IR value: ");
+      //     Serial.print(irRead);
+      //   }
       }
     }
   }
 
-  delay(10);
+  delay(100);
+  Serial.print("Still looping\n");
 }
 
 void soloDemo(){
   // Go forward until reaching wall
-  forward();
   float wallDetectionVal = 0;
+  for(int i = 0; i < 10; i++){
+    wallDetectionVal = analogRead(IRInputPin);
+  }
+  printToScreen("Going", "Forward", "To Wall");
+  forward();
   while(wallDetectionVal < wallThreshold){
     wallDetectionVal = analogRead(IRInputPin);
     delay(10);
   }
+  reset();
 
   // Spin in place then go back towards where we started
-  reset();
+  printToScreen("Turning", "Around", "");
   delay(200);
   rotateRight();
   delay(1500);
   reset();
   delay(200);
+  printToScreen("Finding", "Red Lane", "");
   forward();
 
   // Go forward until we reach red
@@ -244,8 +290,9 @@ void soloDemo(){
   while(rightColorID != 2){
     rightColorID = getColor(1);
   }
-
   reset();
+
+  printToScreen("Turning", "Onto Red", "Lane");
   delay(200);
   rotateLeft();
   delay(800);
@@ -253,15 +300,17 @@ void soloDemo(){
   delay(200);
 
   // Follow red
+  printToScreen("Following", "Red Lane", "");
   followColor(2);
 
   // Spin in place then go towards yellow line
-  reset();
+  printToScreen("Turning", "To Yellow", "Lane");
   delay(200);
   rotateLeft();
   delay(800);
   reset();
   delay(200);
+  printToScreen("Finding", "Yellow", "Lane");
   forward();
 
   // Go forward until we reach yellow
@@ -270,9 +319,10 @@ void soloDemo(){
   while(rightColorID != 4){
     rightColorID = getColor(1);
   }
+  reset();
 
   // Turn towards yellow line
-  reset();
+  printToScreen("Turning", "Onto Yel-", "low Lane");
   delay(200);
   rotateLeft();
   delay(800);
@@ -280,15 +330,18 @@ void soloDemo(){
   delay(200);
 
   // Follow yellow
+  printToScreen("Following", "Yellow", "Lane");
   followColor(4);
+  reset();
 
   // Turn towards original position
-  reset();
+  printToScreen("Turning", "Towards", "Origin");
   delay(200);
   rotateLeft();
   delay(800);
   reset();
   delay(200);
+  printToScreen("Returning", "To Origin", "");
   forward();
 
   wallDetectionVal = analogRead(IRInputPin);
@@ -300,6 +353,7 @@ void soloDemo(){
 
   // Now back where we started
   reset();
+  printToScreen("Finished!", "", "    :)");
 }
 
 void teamDemoRed(){
@@ -581,6 +635,29 @@ void followColor(int targetColorID){
     }
     wallDetectionVal = analogRead(IRInputPin);
   }
+  reset();
+}
+
+void printToScreen(String text1, String text2, String text3){
+  display.clearDisplay();
+
+  display.setCursor(0,0);
+  display.setTextSize(2);
+  display.println("Bot State:");
+  display.println("");
+
+  display.setCursor(0, 16);
+  display.println(text1);
+  display.setCursor(0, 32);
+  display.println(text2);
+  display.setCursor(0, 48);
+  display.println(text3);
+
+  // display.setTextSize(1);
+  // display.println("");
+  // display.println("Moving Forward!");
+  display.display();
+  // display.startscrollright(0x10, 0x20);
 }
 
 void collectAmbient(){
