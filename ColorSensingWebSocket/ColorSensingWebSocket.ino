@@ -13,10 +13,10 @@ const int motorRightBottom = 6; // Pin 2 on L293
 const int motorRightTop = 3; // Pin 7 on L293
 
 // TODO: Update pins to actual pins on Arduino
-const int leftBluePin = 0;
+const int leftBluePin = 0; // Analog out
 const int leftRedPin = 0;
 const int leftPTPin = 0; // Analog in
-const int rightBluePin = 0;
+const int rightBluePin = 0; // Same as left out
 const int rightRedPin = 0;
 const int rightPTPin = 0; // Analog in
 
@@ -54,7 +54,7 @@ float yellowRMin = 50.0;
 const int IROutputPin = 0;
 const int IRInputPin = 5; // Analog in
 
-const float wallThreshold = 800.0;
+const float wallThreshold = 780.0;
 
 // Websocket Settings //
 char ssid[] = "tufts_eecs";
@@ -154,7 +154,11 @@ void setup() {
   display.setCursor(32,28);
   display.println("Hello World!");
   display.display();
-  analogWrite(5, 171);
+  // analogWrite(5, 171);
+
+  client.beginMessage(TYPE_TEXT);
+  client.print("Ready to receive instruction");
+  client.endMessage();
 }
 
 void loop() {
@@ -257,32 +261,64 @@ void loop() {
   }
 
   delay(100);
-  Serial.print("Still looping\n");
+  // Serial.print("Still looping\n");
 }
 
 void soloDemo(){
   // Go forward until reaching wall
   float wallDetectionVal = 0;
-  for(int i = 0; i < 10; i++){
-    wallDetectionVal = analogRead(IRInputPin);
-  }
-  printToScreen("Going", "Forward", "To Wall");
-  forward();
-  while(wallDetectionVal < wallThreshold){
+  for(int i = 0; i < 50; i++){
     wallDetectionVal = analogRead(IRInputPin);
     delay(10);
+  }
+  // printToScreen("Going", "Forward", "To Wall");
+  // float ambientIR;
+  // for(int i = 0; i < 5; i++){
+  //   ambientIR += analogRead(IRInputPin);
+  //   delay(10);
+  // }
+  // ambientIR /= 5;
+
+  String outText = "Wall Detection Value is: ";
+  outText = outText + wallDetectionVal;
+  
+  client.beginMessage(TYPE_TEXT);
+  client.print(outText);
+  client.endMessage();
+  delay(50);
+
+  forward();
+  while(wallDetectionVal < wallThreshold){
+    wallDetectionVal = 0;
+    for(int i = 0; i < 5; i++){
+      wallDetectionVal += analogRead(IRInputPin);
+      delay(10);
+    }
+    wallDetectionVal /= 5;
+    // Serial.print("\nwallDetectionVal is: ");
+    // Serial.print(wallDetectionVal);
+
+    outText = "Wall Detection Value is: " + wallDetectionVal;
+    
+    client.beginMessage(TYPE_TEXT);
+    client.print(outText);
+    client.endMessage();
+    delay(50);
   }
   reset();
 
   // Spin in place then go back towards where we started
-  printToScreen("Turning", "Around", "");
+  // printToScreen("Turning", "Around", "");
   delay(200);
   rotateRight();
-  delay(1500);
+  delay(2000);
   reset();
   delay(200);
-  printToScreen("Finding", "Red Lane", "");
+  // printToScreen("Finding", "Red Lane", "");
   forward();
+
+  delay(4000);
+  reset();
 
   // Go forward until we reach red
   int leftColorID = 0;
