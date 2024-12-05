@@ -24,33 +24,33 @@ const int testingDelay = 1500;
 
 const int battVoltPin = 5; // Analog in
 
-static float blackAmbient = 0.0;
-static float redAmbient = 0.0;
-static float blueAmbient = 0.0;
-static float yellowAmbient = 0.0;
+float blackAmbient = 0.0;
+float redAmbient = 0.0;
+float blueAmbient = 0.0;
+float yellowAmbient = 0.0;
 
 // TODO - Find actual min max values
-static float blackBMax = 100.0;
-static float blackBMin = 50.0;
-static float blackRMax = 100.0;
-static float blackRMin = 50.0;
-static float redBMax = 100.0;
-static float redBMin = 50.0;
-static float redRMax = 100.0;
-static float redRMin = 50.0;
-static float blueBMax = 100.0;
-static float blueBMin = 50.0;
-static float blueRMax = 100.0;
-static float blueRMin = 50.0;
-static float yellowBMax = 100.0;
-static float yellowBMin = 50.0;
-static float yellowRMax = 100.0;
-static float yellowRMin = 50.0;
+float blackBMax = 100.0;
+float blackBMin = 50.0;
+float blackRMax = 100.0;
+float blackRMin = 50.0;
+float redBMax = 100.0;
+float redBMin = 50.0;
+float redRMax = 100.0;
+float redRMin = 50.0;
+float blueBMax = 100.0;
+float blueBMin = 50.0;
+float blueRMax = 100.0;
+float blueRMin = 50.0;
+float yellowBMax = 100.0;
+float yellowBMin = 50.0;
+float yellowRMax = 100.0;
+float yellowRMin = 50.0;
 
 const int IROutputPin = 0;
 const int IRInputPin = 0; // Analog in
 
-static float wallThreshold = 100.0;
+const float wallThreshold = 100.0;
 
 // Websocket Settings //
 char ssid[] = "tufts_eecs";
@@ -563,11 +563,12 @@ int getColor(int side){
 
 void followColor(int targetColorID){
   // Follow
+  float wallDetectionVal = analogRead(IRInputPin);
   while(wallDetectionVal < wallThreshold){
-    leftColorID = getColor(0);
-    rightColorID = getColor(1);
+    int leftColorID = getColor(0);
+    int rightColorID = getColor(1);
     // Went too far right
-    if(leftColorID = targetColorID){
+    if(leftColorID != targetColorID){
       turnLeft();
       delay(100);
       forward();
