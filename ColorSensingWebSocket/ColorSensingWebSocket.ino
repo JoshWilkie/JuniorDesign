@@ -109,11 +109,10 @@ void followColor(int targetColorID);
 void testColor();
 
 float collectLight(int pin);
-void collectAmbient();
+// void collectAmbient();
 
 void collectMinMax();
 void printMinMax();
-void resetColor();
 
 void printToScreen(String text);
 
@@ -459,74 +458,47 @@ void getColor(int *leftID, int *rightID){
   // Code for checking left color
   if(leftBlueReading < blackBMaxLeft && leftBlueReading > blackBMinLeft && leftRedReading < blackRMaxLeft && leftRedReading > blackRMinLeft){
     *leftID = 1; // Reads Black
-    Serial.print("Left Found Black\n");
+    Serial.println("Left Found Black");
+    Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
   }else if(leftBlueReading < redBMaxLeft && leftBlueReading > redBMinLeft && leftRedReading < redRMaxLeft && leftRedReading > redRMinLeft){
     *leftID = 2; // Reads Red
-    Serial.print("Left Found Red\n");
+    Serial.println("Left Found Red");
+    Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
   }else if(leftBlueReading < blueBMaxLeft && leftBlueReading > blueBMinLeft && leftRedReading < blueRMaxLeft && leftRedReading > blueRMinLeft){
     *leftID = 3; // Reads Blue
-    Serial.print("Left Found Blue\n");
+    Serial.println("Left Found Blue");
+    Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
   }else if(leftBlueReading < yellowBMaxLeft && leftBlueReading > yellowBMinLeft && leftRedReading < yellowRMaxLeft && leftRedReading > yellowRMinLeft){
     *leftID = 4; // Reads Yellow
-    Serial.print("Left Found Yellow\n");
+    Serial.println("Left Found Yellow");
+    Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
   }else{
-    Serial.print("Left Found Invalid\n");
-    Serial.print("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
+    Serial.println("Left Found Invalid");
+    Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
   }
 
   // Code for checking right color
   if(rightBlueReading < blackBMaxRight && rightBlueReading > blackBMinRight && rightRedReading < blackRMaxRight && rightRedReading > blackRMinRight){
     *rightID = 1; // Reads Black
-    Serial.print("Right Found Black\n");
+    Serial.println("Right Found Black");
+    Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
   }else if(rightBlueReading < redBMaxRight && rightBlueReading > redBMinRight && rightRedReading < redRMaxRight && rightRedReading > redRMinRight){
     *rightID = 2; // Reads Red
-    Serial.print("Right Found Red\n");
+    Serial.println("Right Found Red");
+    Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
   }else if(rightBlueReading < blueBMaxRight && rightBlueReading > blueBMinRight && rightRedReading < blueRMaxRight && rightRedReading > blueRMinRight){
     *rightID = 3; // Reads Blue
-    Serial.print("Right Found Blue\n");
+    Serial.println("Right Found Blue");
+    Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
   }else if(rightBlueReading < yellowBMaxRight && rightBlueReading > yellowBMinRight && rightRedReading < yellowRMaxRight && rightRedReading > yellowRMinRight){
     *rightID = 4; // Reads Yellow
-    Serial.print("Right Found Yellow\n");
+    Serial.println("Right Found Yellow");
+    Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
   }else{
-    Serial.print("Right Found Invalid\n");
-    Serial.print("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
+    Serial.println("Right Found Invalid");
+    Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
   }
 }
-
-// void resetColor(){
-//   blackBMaxRight   = 0.00;
-//   blackBMinRight   = 10000.0;
-//   blackRMaxRight   = 0.00;
-//   blackRMinRight   = 10000.0;
-//   redBMaxRight     = 0.00;
-//   redBMinRight     = 10000.0;
-//   redRMaxRight     = 0.00;
-//   redRMinRight     = 10000.0;
-//   blueBMaxRight    = 0.00;
-//   blueBMinRight    = 10000.0;
-//   blueRMaxRight    = 0.00;
-//   blueRMinRight    = 10000.0;
-//   yellowBMaxRight  = 0.00;
-//   yellowBMinRight  = 10000.0;
-//   yellowRMaxRight  = 0.00;
-//   yellowRMinRight  = 10000.0; 
-//   blackBMaxLeft   = 0.00;
-//   blackBMinLeft   = 10000.0;
-//   blackRMaxLeft   = 0.00;
-//   blackRMinLeft   = 10000.0;
-//   redBMaxLeft     = 0.00;
-//   redBMinLeft     = 10000.0;
-//   redRMaxLeft     = 0.00;
-//   redRMinLeft     = 10000.0;
-//   blueBMaxLeft    = 0.00;
-//   blueBMinLeft    = 10000.0;
-//   blueRMaxLeft    = 0.00;
-//   blueRMinLeft    = 10000.0;
-//   yellowBMaxLeft  = 0.00;
-//   yellowBMinLeft  = 10000.0;
-//   yellowRMaxLeft  = 0.00;
-//   yellowRMinLeft  = 10000.0;
-// }
 
 void testColor(){
   int temp1;
@@ -535,6 +507,211 @@ void testColor(){
     getColor(&temp1, &temp2);
   }
 }
+
+// PRACTICE LIKE WE PLAY MINMAX FUNCTION
+
+// void collectMinMax(){
+//   float leftReading = 0;
+//   float rightReading = 0;
+
+//   int colorDelay = 200;
+
+//   // Calibrate min/max values for red & blue LED on black surface
+//   for(int i = 0; i < 15; i++){
+//     // Turn on red LED both sides
+//     digitalWrite(bluePin, 0);
+//     digitalWrite(redPin, 172);
+//     delay(colorDelay);
+
+//     leftReading = analogRead(leftPTPin);
+//     rightReading = analogRead(rightPTPin);
+//     if(leftReading > blackRMaxLeft){
+//       blackRMaxLeft = leftReading;
+//     }
+//     if(leftReading < blackRMinLeft){
+//       blackRMinLeft = leftReading;
+//     }
+//     if(rightReading > blackRMaxRight){
+//       blackRMaxRight = rightReading;
+//     }
+//     if(rightReading < blackRMinRight){
+//       blackRMinRight = rightReading;
+//     }
+
+//     // Turn on blue LED both sides
+//     analogWrite(redPin, 0);
+//     analogWrite(bluePin, 172);
+//     delay(colorDelay);
+
+//     leftReading = analogRead(leftPTPin);
+//     rightReading = analogRead(rightPTPin);
+//     if(leftReading > blackBMaxLeft){
+//       blackBMaxLeft = leftReading;
+//     }
+//     if(leftReading < blackBMinLeft){
+//       blackBMinLeft = leftReading;
+//     }
+//     if(rightReading > blackBMaxRight){
+//       blackBMaxRight = rightReading;
+//     }
+//     if(rightReading < blackBMinRight){
+//       blackBMinRight = rightReading;
+//     }
+//   }
+
+//   // Turn on both LEDs to signify to change surface color
+//   analogWrite(redPin, 172);
+//   analogWrite(bluePin, 172);
+
+//   delay(5000);
+
+//   // Calibrate min/max values for red & blue LED on red surface
+//   for(int i = 0; i < 15; i++){
+//     // Turn on red LED both sides
+//     digitalWrite(bluePin, 0);
+//     digitalWrite(redPin, 172);
+//     delay(colorDelay);
+
+//     leftReading = analogRead(leftPTPin);
+//     rightReading = analogRead(rightPTPin);
+//     if(leftReading > redRMaxLeft){
+//       redRMaxLeft = leftReading;
+//     }
+//     if(leftReading < redRMinLeft){
+//       redRMinLeft = leftReading;
+//     }
+//     if(rightReading > redRMaxRight){
+//       redRMaxRight = rightReading;
+//     }
+//     if(rightReading < redRMinRight){
+//       redRMinRight = rightReading;
+//     }
+
+//     // Turn on blue LED both sides
+//     analogWrite(redPin, 0);
+//     analogWrite(bluePin, 172);
+//     delay(colorDelay);
+
+//     leftReading = analogRead(leftPTPin);
+//     rightReading = analogRead(rightPTPin);
+//     if(leftReading > redBMaxLeft){
+//       redBMaxLeft = leftReading;
+//     }
+//     if(leftReading < redBMinLeft){
+//       redBMinLeft = leftReading;
+//     }
+//     if(rightReading > redBMaxRight){
+//       redBMaxRight = rightReading;
+//     }
+//     if(rightReading < redBMinRight){
+//       redBMinRight = rightReading;
+//     }
+//   }
+
+//   // Turn on both LEDs to signify to change surface color
+//   analogWrite(redPin, 172);
+//   analogWrite(bluePin, 172);
+
+//   delay(5000);
+
+//   // Calibrate min/max values for red & blue LED on blue surface
+//   for(int i = 0; i < 15; i++){
+//     // Turn on red LED both sides
+//     digitalWrite(bluePin, 0);
+//     digitalWrite(redPin, 172);
+//     delay(colorDelay);
+
+//     leftReading = analogRead(leftPTPin);
+//     rightReading = analogRead(rightPTPin);
+//     if(leftReading > blueRMaxLeft){
+//       blueRMaxLeft = leftReading;
+//     }
+//     if(leftReading < blueRMinLeft){
+//       blueRMinLeft = leftReading;
+//     }
+//     if(rightReading > blueRMaxRight){
+//       blueRMaxRight = rightReading;
+//     }
+//     if(rightReading < blueRMinRight){
+//       blueRMinRight = rightReading;
+//     }
+
+//     // Turn on blue LED both sides
+//     analogWrite(redPin, 0);
+//     analogWrite(bluePin, 172);
+//     delay(colorDelay);
+
+//     leftReading = analogRead(leftPTPin);
+//     rightReading = analogRead(rightPTPin);
+//     if(leftReading > blueBMaxLeft){
+//       blueBMaxLeft = leftReading;
+//     }
+//     if(leftReading < blueBMinLeft){
+//       blueBMinLeft = leftReading;
+//     }
+//     if(rightReading > blueBMaxRight){
+//       blueBMaxRight = rightReading;
+//     }
+//     if(rightReading < blueBMinRight){
+//       blueBMinRight = rightReading;
+//     }
+//   }
+
+//   // Turn on both LEDs to signify to change surface color
+//   analogWrite(redPin, 172);
+//   analogWrite(bluePin, 172);
+
+//   delay(5000);
+
+//   // Calibrate min/max values for red & blue LED on yellow surface
+//   for(int i = 0; i < 15; i++){
+//     // Turn on red LED both sides
+//     digitalWrite(bluePin, 0);
+//     digitalWrite(redPin, 172);
+//     delay(colorDelay);
+
+//     leftReading = analogRead(leftPTPin);
+//     rightReading = analogRead(rightPTPin);
+//     if(leftReading > yellowRMaxLeft){
+//       yellowRMaxLeft = leftReading;
+//     }
+//     if(leftReading < yellowRMinLeft){
+//       yellowRMinLeft = leftReading;
+//     }
+//     if(rightReading > yellowRMaxRight){
+//       yellowRMaxRight = rightReading;
+//     }
+//     if(rightReading < yellowRMinRight){
+//       yellowRMinRight = rightReading;
+//     }
+
+//     // Turn on blue LED both sides
+//     analogWrite(redPin, 0);
+//     analogWrite(bluePin, 172);
+//     delay(colorDelay);
+
+//     leftReading = analogRead(leftPTPin);
+//     rightReading = analogRead(rightPTPin);
+//     if(leftReading > yellowBMaxLeft){
+//       yellowBMaxLeft = leftReading;
+//     }
+//     if(leftReading < yellowBMinLeft){
+//       yellowBMinLeft = leftReading;
+//     }
+//     if(rightReading > yellowBMaxRight){
+//       yellowBMaxRight = rightReading;
+//     }
+//     if(rightReading < yellowBMinRight){
+//       yellowBMinRight = rightReading;
+//     }
+//   }
+
+//   // Turn off both LEDs, we're done here
+//   analogWrite(redPin, 0);
+//   analogWrite(bluePin, 0);
+// }
+
+// OG MINMAX FUNCTION WITH GRIFFIN EDITS
 
 void collectMinMax(){
   float leftReading = 0;
@@ -745,115 +922,51 @@ void collectMinMax(){
   // Turn off both LEDs, we're done here
   analogWrite(redPin, 0);
   analogWrite(bluePin, 0);
+  blackBMaxRight   += 15;
+  blackBMinRight   -= 15;
+  blackRMaxRight   += 15;
+  blackRMinRight   -= 15;
+  redBMaxRight     += 15;
+  redBMinRight     -= 15;
+  redRMaxRight     += 15;
+  redRMinRight     -= 15;
+  blueBMaxRight    += 15;
+  blueBMinRight    -= 15;
+  blueRMaxRight    += 15;
+  blueRMinRight    -= 15;
+  yellowBMaxRight  += 15;
+  yellowBMinRight  -= 15;
+  yellowRMaxRight  += 15;
+  yellowRMinRight  -= 15;
+
+  blackBMaxLeft   += 15;
+  blackBMinLeft   -= 15;
+  blackRMaxLeft   += 15;
+  blackRMinLeft   -= 15;
+  redBMaxLeft     += 15;
+  redBMinLeft     -= 15;
+  redRMaxLeft     += 15;
+  redRMinLeft     -= 15;
+  blueBMaxLeft    += 15;
+  blueBMinLeft    -= 15;
+  blueRMaxLeft    += 15;
+  blueRMinLeft    -= 15;
+  yellowBMaxLeft  += 15;
+  yellowBMinLeft  -= 15;
+  yellowRMaxLeft  += 15;
+  yellowRMinLeft  -= 15;
 }
 
 void printMinMax(){
-  Serial.print("Black Surface Blue LED Range:     " + (String)blackBMinLeft + " - " + (String)blackBMaxLeft + " & " + (String)blackBMinRight + " - " + (String)blackBMaxRight);
-  Serial.print("Black Surface Red LED Range:      " + (String)blackRMinLeft + " - " + (String)blackRMaxLeft + " & " + (String)blackRMinRight + " - " + (String)blackRMaxRight);
-  Serial.print("Red Surface Blue LED Range:       " + (String)redBMinLeft + " - " + (String)redBMaxLeft + " & " + (String)redBMinRight + " - " + (String)redBMaxRight);
-  Serial.print("Red Surface Red LED Range:        " + (String)redRMinLeft + " - " + (String)redRMaxLeft + " & " + (String)redRMinRight + " - " + (String)redRMaxRight);
-  Serial.print("Blue Surface Blue LED Range:      " + (String)blueBMinLeft + " - " + (String)blueBMaxLeft + " & " + (String)blueBMinRight + " - " + (String)blueBMaxRight);
-  Serial.print("Blue Surface Red LED Range:       " + (String)blueRMinLeft + " - " + (String)blueRMaxLeft + " & " + (String)blueRMinRight + " - " + (String)blueRMaxRight);
-  Serial.print("Yellow Surface Blue LED Range:    " + (String)yellowBMinLeft + " - " + (String)yellowBMaxLeft + " & " + (String)yellowBMinRight + " - " + (String)yellowBMaxRight);
-  Serial.print("Yellow Surface Red LED Range:     " + (String)yellowRMinLeft + " - " + (String)yellowRMaxLeft + " & " + (String)yellowRMinRight + " - " + (String)yellowRMaxRight);
+  Serial.println("Black Surface Blue LED Range:     " + (String)blackBMinLeft + " - " + (String)blackBMaxLeft + " & " + (String)blackBMinRight + " - " + (String)blackBMaxRight);
+  Serial.println("Black Surface Red LED Range:      " + (String)blackRMinLeft + " - " + (String)blackRMaxLeft + " & " + (String)blackRMinRight + " - " + (String)blackRMaxRight);
+  Serial.println("Red Surface Blue LED Range:       " + (String)redBMinLeft + " - " + (String)redBMaxLeft + " & " + (String)redBMinRight + " - " + (String)redBMaxRight);
+  Serial.println("Red Surface Red LED Range:        " + (String)redRMinLeft + " - " + (String)redRMaxLeft + " & " + (String)redRMinRight + " - " + (String)redRMaxRight);
+  Serial.println("Blue Surface Blue LED Range:      " + (String)blueBMinLeft + " - " + (String)blueBMaxLeft + " & " + (String)blueBMinRight + " - " + (String)blueBMaxRight);
+  Serial.println("Blue Surface Red LED Range:       " + (String)blueRMinLeft + " - " + (String)blueRMaxLeft + " & " + (String)blueRMinRight + " - " + (String)blueRMaxRight);
+  Serial.println("Yellow Surface Blue LED Range:    " + (String)yellowBMinLeft + " - " + (String)yellowBMaxLeft + " & " + (String)yellowBMinRight + " - " + (String)yellowBMaxRight);
+  Serial.println("Yellow Surface Red LED Range:     " + (String)yellowRMinLeft + " - " + (String)yellowRMaxLeft + " & " + (String)yellowRMinRight + " - " + (String)yellowRMaxRight);
 }
-
-// void minMaxHelper(int color){
-//   float *BMaxLeft;
-//   float *BMinLeft;
-//   float *BMaxRight;
-//   float *BMinRight;
-//   float *RMaxLeft;
-//   float *RMinLeft;
-//   float *RMaxRight;
-//   float *RMinRight;
-//   if(color == 1){
-//     BMaxLeft  = &blackBMaxLeft;
-//     BMinLeft  = &blackBMinLeft;
-//     BMaxRight = &blackBMaxRight;
-//     BMinRight = &blackBMinRight;
-//     RMaxLeft  = &blackRMaxLeft;
-//     RMinLeft  = &blackRMinLeft;
-//     RMaxRight = &blackRMaxRight;
-//     RMinRight = &blackRMinRight;
-//   }else if(color == 2){
-//     BMaxLeft  = redBMaxLeft;
-//     BMinLeft  = redBMinLeft;
-//     BMaxRight = redBMaxRight;
-//     BMinRight = redBMinRight;
-//     RMaxLeft  = redRMaxLeft;
-//     RMinLeft  = redRMinLeft;
-//     RMaxRight = redRMaxRight;
-//     RMinRight = redRMinRight;
-//   }else if (color == 3){
-//     BMaxLeft  = blueBMaxLeft;
-//     BMinLeft  = blueBMinLeft;
-//     BMaxRight = blueBMaxRight;
-//     BMinRight = blueBMinRight;
-//     RMaxLeft  = blueRMaxLeft;
-//     RMinLeft  = blueRMinLeft;
-//     RMaxRight = blueRMaxRight;
-//     RMinRight = blueRMinRight;
-//   }else{
-//     BMaxLeft  = yellowBMaxLeft;
-//     BMinLeft  = yellowBMinLeft;
-//     BMaxRight = yellowBMaxRight;
-//     BMinRight = yellowBMinRight;
-//     RMaxLeft  = yellowRMaxLeft;
-//     RMinLeft  = yellowRMinLeft;
-//     RMaxRight = yellowRMaxRight;
-//     RMinRight = yellowRMinRight;
-//   }
-//   analogWrite(redPin, 172);
-//   analogWrite(bluePin, 0);
-//   delay(250);
-//   for(int i = 0; i < 100; i++){
-//     delay(50);
-//     leftReading = analogRead(leftPTPin);
-//     rightReading = analogRead(rightPTPin);
-//     if(leftReading > blackRMaxLeft){
-//       blackRMaxLeft = leftReading;
-//     }
-//     if(leftReading < blackRMinLeft){
-//       blackRMinLeft = leftReading;
-//     }
-//     if(rightReading > blackRMaxRight){
-//       blackRMaxRight = rightReading;
-//     }
-//     if(rightReading < blackRMinRight){
-//       blackRMinRight = rightReading;
-//     }
-//   }
-
-//   // Calibrate min/max values for blue LED on black surface
-//   // Turn on blue LED both sides
-//   analogWrite(redPin, 0);
-//   analogWrite(bluePin, 172);
-//   delay(250);
-//   for(int i = 0; i < 100; i++){
-//     delay(50);
-//     leftReading = analogRead(leftPTPin);
-//     rightReading = analogRead(rightPTPin);
-//     if(leftReading > blackBMaxLeft){
-//       blackBMaxLeft = leftReading;
-//     }
-//     if(leftReading < blackBMinLeft){
-//       blackBMinLeft = leftReading;
-//     }
-//     if(rightReading > blackBMaxRight){
-//       blackBMaxRight = rightReading;
-//     }
-//     if(rightReading < blackBMinRight){
-//       blackBMinRight = rightReading;
-//     }
-//   }
-
-//   // Turn on both LEDs to signify to change surface color
-//   analogWrite(redPin, 172);
-//   analogWrite(bluePin, 172);
-
-//   delay(5000);
-// }
 
 // TODO: Update followColor to use logic on which side is black and which side is on color, turn accordingly with color updates
 void followColor(int targetColorID){

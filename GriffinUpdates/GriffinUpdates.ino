@@ -521,41 +521,6 @@ void getColor(int *leftID, int *rightID){
   }
 }
 
-// void resetColor(){
-//   blackBMaxRight   = 0.00;
-//   blackBMinRight   = 10000.0;
-//   blackRMaxRight   = 0.00;
-//   blackRMinRight   = 10000.0;
-//   redBMaxRight     = 0.00;
-//   redBMinRight     = 10000.0;
-//   redRMaxRight     = 0.00;
-//   redRMinRight     = 10000.0;
-//   blueBMaxRight    = 0.00;
-//   blueBMinRight    = 10000.0;
-//   blueRMaxRight    = 0.00;
-//   blueRMinRight    = 10000.0;
-//   yellowBMaxRight  = 0.00;
-//   yellowBMinRight  = 10000.0;
-//   yellowRMaxRight  = 0.00;
-//   yellowRMinRight  = 10000.0; 
-//   blackBMaxLeft   = 0.00;
-//   blackBMinLeft   = 10000.0;
-//   blackRMaxLeft   = 0.00;
-//   blackRMinLeft   = 10000.0;
-//   redBMaxLeft     = 0.00;
-//   redBMinLeft     = 10000.0;
-//   redRMaxLeft     = 0.00;
-//   redRMinLeft     = 10000.0;
-//   blueBMaxLeft    = 0.00;
-//   blueBMinLeft    = 10000.0;
-//   blueRMaxLeft    = 0.00;
-//   blueRMinLeft    = 10000.0;
-//   yellowBMaxLeft  = 0.00;
-//   yellowBMinLeft  = 10000.0;
-//   yellowRMaxLeft  = 0.00;
-//   yellowRMinLeft  = 10000.0;
-// }
-
 void testColor(){
   int temp1;
   int temp2;
@@ -773,41 +738,39 @@ void collectMinMax(){
   // Turn off both LEDs, we're done here
   analogWrite(redPin, 0);
   analogWrite(bluePin, 0);
- blackBMaxRight   += 15;
- blackBMinRight   -= 15;
- blackRMaxRight   += 15;
- blackRMinRight   -= 15;
- redBMaxRight     += 15;
- redBMinRight     -= 15;
- redRMaxRight     += 15;
- redRMinRight     -= 15;
- blueBMaxRight    += 15;
- blueBMinRight    -= 15;
- blueRMaxRight    += 15;
- blueRMinRight    -= 15;
- yellowBMaxRight  += 15;
- yellowBMinRight  -= 15;
- yellowRMaxRight  += 15;
- yellowRMinRight  -= 15;
+  blackBMaxRight   += 15;
+  blackBMinRight   -= 15;
+  blackRMaxRight   += 15;
+  blackRMinRight   -= 15;
+  redBMaxRight     += 15;
+  redBMinRight     -= 15;
+  redRMaxRight     += 15;
+  redRMinRight     -= 15;
+  blueBMaxRight    += 15;
+  blueBMinRight    -= 15;
+  blueRMaxRight    += 15;
+  blueRMinRight    -= 15;
+  yellowBMaxRight  += 15;
+  yellowBMinRight  -= 15;
+  yellowRMaxRight  += 15;
+  yellowRMinRight  -= 15;
 
- blackBMaxLeft   += 15;
- blackBMinLeft   -= 15;
- blackRMaxLeft   += 15;
- blackRMinLeft   -= 15;
- redBMaxLeft     += 15;
- redBMinLeft     -= 15;
- redRMaxLeft     += 15;
- redRMinLeft     -= 15;
- blueBMaxLeft    += 15;
- blueBMinLeft    -= 15;
- blueRMaxLeft    += 15;
- blueRMinLeft    -= 15;
- yellowBMaxLeft  += 15;
- yellowBMinLeft  -= 15;
- yellowRMaxLeft  += 15;
- yellowRMinLeft  -= 15;
-
-
+  blackBMaxLeft   += 15;
+  blackBMinLeft   -= 15;
+  blackRMaxLeft   += 15;
+  blackRMinLeft   -= 15;
+  redBMaxLeft     += 15;
+  redBMinLeft     -= 15;
+  redRMaxLeft     += 15;
+  redRMinLeft     -= 15;
+  blueBMaxLeft    += 15;
+  blueBMinLeft    -= 15;
+  blueRMaxLeft    += 15;
+  blueRMinLeft    -= 15;
+  yellowBMaxLeft  += 15;
+  yellowBMinLeft  -= 15;
+  yellowRMaxLeft  += 15;
+  yellowRMinLeft  -= 15;
 }
 
 void printMinMax(){
