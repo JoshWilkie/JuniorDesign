@@ -13,12 +13,12 @@ const int motorRightBottom = 6; // Pin 2 on L293
 const int motorRightTop = 3; // Pin 7 on L293
 
 // TODO: Update pins to actual pins on Arduino
-const int leftBluePin = 0; // Analog out
-const int leftRedPin = 0;
-const int leftPTPin = 0; // Analog in
-const int rightBluePin = 0; // Same as left out
-const int rightRedPin = 0;
-const int rightPTPin = 0; // Analog in
+const int leftBluePin = 11; // Analog out
+const int leftRedPin = 5;
+const int leftPTPin = 3; // Analog in
+const int rightBluePin = 11; // Same as left out
+const int rightRedPin = 5;
+const int rightPTPin = 4; // Analog in
 
 const int maxPower = 100;
 const int midPower = 70;
@@ -34,25 +34,42 @@ float blueAmbient = 0.0;
 float yellowAmbient = 0.0;
 
 // TODO - Find actual min max values
-float blackBMax = 100.0;
-float blackBMin = 50.0;
-float blackRMax = 100.0;
-float blackRMin = 50.0;
-float redBMax = 100.0;
-float redBMin = 50.0;
-float redRMax = 100.0;
-float redRMin = 50.0;
-float blueBMax = 100.0;
-float blueBMin = 50.0;
-float blueRMax = 100.0;
-float blueRMin = 50.0;
-float yellowBMax = 100.0;
-float yellowBMin = 50.0;
-float yellowRMax = 100.0;
-float yellowRMin = 50.0;
+float blackBMaxRight   = 0.00;
+float blackBMinRight   = 10000.0;
+float blackRMaxRight   = 0.00;
+float blackRMinRight   = 10000.0;
+float redBMaxRight     = 0.00;
+float redBMinRight     = 10000.0;
+float redRMaxRight     = 0.00;
+float redRMinRight     = 10000.0;
+float blueBMaxRight    = 0.00;
+float blueBMinRight    = 10000.0;
+float blueRMaxRight    = 0.00;
+float blueRMinRight    = 10000.0;
+float yellowBMaxRight  = 0.00;
+float yellowBMinRight  = 10000.0;
+float yellowRMaxRight  = 0.00;
+float yellowRMinRight  = 10000.0;
 
-const int IROutputPin = 0;
-const int IRInputPin = 5; // Analog in
+float blackBMaxLeft   = 0.00;
+float blackBMinLeft   = 10000.0;
+float blackRMaxLeft   = 0.00;
+float blackRMinLeft   = 10000.0;
+float redBMaxLeft     = 0.00;
+float redBMinLeft     = 10000.0;
+float redRMaxLeft     = 0.00;
+float redRMinLeft     = 10000.0;
+float blueBMaxLeft    = 0.00;
+float blueBMinLeft    = 10000.0;
+float blueRMaxLeft    = 0.00;
+float blueRMinLeft    = 10000.0;
+float yellowBMaxLeft  = 0.00;
+float yellowBMinLeft  = 10000.0;
+float yellowRMaxLeft  = 0.00;
+float yellowRMinLeft  = 10000.0;
+
+// const int IROutputPin = 0;
+const int IRInputPin = 0; // Analog in
 
 const float wallThreshold = 780.0;
 
@@ -95,6 +112,8 @@ void followColor(int targetColorID);
 
 float collectLight(int pin);
 void collectAmbient();
+
+void collectLight();
 
 void printToScreen(String text);
 
@@ -280,7 +299,7 @@ void soloDemo(){
   // ambientIR /= 5;
 
   String outText = "Wall Detection Value is: ";
-  outText = outText + wallDetectionVal;
+  // outText = outText + wallDetectionVal;
   
   client.beginMessage(TYPE_TEXT);
   client.print(outText);
@@ -298,10 +317,10 @@ void soloDemo(){
     // Serial.print("\nwallDetectionVal is: ");
     // Serial.print(wallDetectionVal);
 
-    outText = "Wall Detection Value is: " + wallDetectionVal;
+    // outText = "Wall Detection Value is: " + wallDetectionVal;
     
     client.beginMessage(TYPE_TEXT);
-    client.print(outText);
+    client.print(outText + wallDetectionVal);
     client.endMessage();
     delay(50);
   }
@@ -617,14 +636,62 @@ int getColor(int side){
   int bluePin = 0;
   int redPin = 0;
   int PTPin = 0;
+  float blackBMax;
+  float blackBMin;
+  float blackRMax;
+  float blackRMin;
+  float redBMax;
+  float redBMin;
+  float redRMax;
+  float redRMin;
+  float blueBMax;
+  float blueBMin;
+  float blueRMax;
+  float blueRMin;
+  float yellowBMax;
+  float yellowBMin;
+  float yellowRMax;
+  float yellowRMin;
   if(side == 0){
-    bluePin = leftBluePin;
-    redPin  = leftRedPin;
-    PTPin   = leftPTPin;
+    bluePin     = leftBluePin;
+    redPin      = leftRedPin;
+    PTPin       = leftPTPin;
+    blackBMax   = blackBMaxLeft;
+    blackBMin   = blackBMinLeft;
+    blackRMax   = blackRMaxLeft;
+    blackRMin   = blackRMinLeft;
+    redBMax     = redBMaxLeft;
+    redBMin     = redBMinLeft;
+    redRMax     = redRMaxLeft;
+    redRMin     = redRMinLeft;
+    blueBMax    = blueBMaxLeft;
+    blueBMin    = blueBMinLeft;
+    blueRMax    = blueRMaxLeft;
+    blueRMin    = blueRMinLeft;
+    yellowBMax  = yellowBMaxLeft;
+    yellowBMin  = yellowBMinLeft;
+    yellowRMax  = yellowRMaxLeft;
+    yellowRMin  = yellowRMinLeft;
   }else{
-    bluePin = rightBluePin;
-    redPin  = rightRedPin;
-    PTPin   = rightPTPin;
+    bluePin     = rightBluePin;
+    redPin      = rightRedPin;
+    PTPin       = rightPTPin;
+    blackBMax   = blackBMaxRight;
+    blackBMin   = blackBMinRight;
+    blackRMax   = blackRMaxRight;
+    blackRMin   = blackRMinRight;
+    redBMax     = redBMaxRight;
+    redBMin     = redBMinRight;
+    redRMax     = redRMaxRight;
+    redRMin     = redRMinRight;
+    blueBMax    = blueBMaxRight;
+    blueBMin    = blueBMinRight;
+    blueRMax    = blueRMaxRight;
+    blueRMin    = blueRMinRight;
+    yellowBMax  = yellowBMaxRight;
+    yellowBMin  = yellowBMinRight;
+    yellowRMax  = yellowRMaxRight;
+    yellowRMin  = yellowRMinRight;
   }
   int colorDelay = 12;
   digitalWrite(bluePin, HIGH);
@@ -649,6 +716,197 @@ int getColor(int side){
   }else if((blueReading - yellowAmbient) < yellowBMax && (blueReading - yellowAmbient) > yellowBMin && (redReading - yellowAmbient) < yellowRMax && (redReading - yellowAmbient) > yellowRMin){
     return 4; // Reads Yellow
   }
+}
+
+void collectColor(){
+  float leftReading = 0;
+  float rightReading = 0;
+  int redPin = rightRedPin;
+  int bluePin = rightBluePin;
+
+  // Calibrate min/max values for red LED on black surface
+  // Turn on red LED both sides
+  analogWrite(redPin, 172);
+  analogWrite(bluePin, 0);
+  for(int i = 0; i < 100; i++){
+    leftReading = analogRead(leftPTPin);
+    rightReading = analogRead(rightPTPin);
+    if(leftReading > blackRMaxLeft){
+      blackRMaxLeft = leftReading;
+    }
+    if(leftReading < blackRMinLeft){
+      blackRMinLeft = leftReading;
+    }
+    if(rightReading > blackRMaxRight){
+      blackRMaxRight = rightReading;
+    }
+    if(rightReading < blackRMinRight){
+      blackRMinRight = rightReading;
+    }
+  }
+
+  // Calibrate min/max values for blue LED on black surface
+  // Turn on blue LED both sides
+  analogWrite(redPin, 0);
+  analogWrite(bluePin, 172);
+  for(int i = 0; i < 100; i++){
+    leftReading = analogRead(leftPTPin);
+    rightReading = analogRead(rightPTPin);
+    if(leftReading > blackBMaxLeft){
+      blackBMaxLeft = leftReading;
+    }
+    if(leftReading < blackBMinLeft){
+      blackBMinLeft = leftReading;
+    }
+    if(rightReading > blackBMaxRight){
+      blackBMaxRight = rightReading;
+    }
+    if(rightReading < blackBMinRight){
+      blackBMinRight = rightReading;
+    }
+  }
+
+  // Turn on both LEDs to signify to change surface color
+  analogWrite(redPin, 172);
+  analogWrite(bluePin, 172);
+
+  // Calibrate min/max values for red LED on red surface
+  // Turn on red LED both sides
+  analogWrite(redPin, 172);
+  analogWrite(bluePin, 0);
+  for(int i = 0; i < 100; i++){
+    leftReading = analogRead(leftPTPin);
+    rightReading = analogRead(rightPTPin);
+    if(leftReading > redRMaxLeft){
+      redRMaxLeft = leftReading;
+    }
+    if(leftReading < redRMinLeft){
+      redRMinLeft = leftReading;
+    }
+    if(rightReading > redRMaxRight){
+      redRMaxRight = rightReading;
+    }
+    if(rightReading < redRMinRight){
+      redRMinRight = rightReading;
+    }
+  }
+
+  // Calibrate min/max values for blue LED on red surface
+  // Turn on blue LED both sides
+  analogWrite(redPin, 0);
+  analogWrite(bluePin, 172);
+  for(int i = 0; i < 100; i++){
+    leftReading = analogRead(leftPTPin);
+    rightReading = analogRead(rightPTPin);
+    if(leftReading > redBMaxLeft){
+      redBMaxLeft = leftReading;
+    }
+    if(leftReading < redBMinLeft){
+      redBMinLeft = leftReading;
+    }
+    if(rightReading > redBMaxRight){
+      redBMaxRight = rightReading;
+    }
+    if(rightReading < redBMinRight){
+      redBMinRight = rightReading;
+    }
+  }
+
+  // Turn on both LEDs to signify to change surface color
+  analogWrite(redPin, 172);
+  analogWrite(bluePin, 172);
+
+  // Calibrate min/max values for red LED on blue surface
+  // Turn on red LED both sides
+  analogWrite(redPin, 172);
+  analogWrite(bluePin, 0);
+  for(int i = 0; i < 100; i++){
+    leftReading = analogRead(leftPTPin);
+    rightReading = analogRead(rightPTPin);
+    if(leftReading > blueRMaxLeft){
+      blueRMaxLeft = leftReading;
+    }
+    if(leftReading < blueRMinLeft){
+      blueRMinLeft = leftReading;
+    }
+    if(rightReading > blueRMaxRight){
+      blueRMaxRight = rightReading;
+    }
+    if(rightReading < blueRMinRight){
+      blueRMinRight = rightReading;
+    }
+  }
+
+  // Calibrate min/max values for blue LED on blue surface
+  // Turn on blue LED both sides
+  analogWrite(redPin, 0);
+  analogWrite(bluePin, 172);
+  for(int i = 0; i < 100; i++){
+    leftReading = analogRead(leftPTPin);
+    rightReading = analogRead(rightPTPin);
+    if(leftReading > blueBMaxLeft){
+      blueBMaxLeft = leftReading;
+    }
+    if(leftReading < blueBMinLeft){
+      blueBMinLeft = leftReading;
+    }
+    if(rightReading > blueBMaxRight){
+      blueBMaxRight = rightReading;
+    }
+    if(rightReading < blueBMinRight){
+      blueBMinRight = rightReading;
+    }
+  }
+
+  // Turn on both LEDs to signify to change surface color
+  analogWrite(redPin, 172);
+  analogWrite(bluePin, 172);
+
+  // Calibrate min/max values for red LED on yellow surface
+  // Turn on red LED both sides
+  analogWrite(redPin, 172);
+  analogWrite(bluePin, 0);
+  for(int i = 0; i < 100; i++){
+    leftReading = analogRead(leftPTPin);
+    rightReading = analogRead(rightPTPin);
+    if(leftReading > yellowRMaxLeft){
+      yellowRMaxLeft = leftReading;
+    }
+    if(leftReading < yellowRMinLeft){
+      yellowRMinLeft = leftReading;
+    }
+    if(rightReading > yellowRMaxRight){
+      yellowRMaxRight = rightReading;
+    }
+    if(rightReading < yellowRMinRight){
+      yellowRMinRight = rightReading;
+    }
+  }
+
+  // Calibrate min/max values for blue LED on yellow surface
+  // Turn on blue LED both sides
+  analogWrite(redPin, 0);
+  analogWrite(bluePin, 172);
+  for(int i = 0; i < 100; i++){
+    leftReading = analogRead(leftPTPin);
+    rightReading = analogRead(rightPTPin);
+    if(leftReading > yellowBMaxLeft){
+      yellowBMaxLeft = leftReading;
+    }
+    if(leftReading < yellowBMinLeft){
+      yellowBMinLeft = leftReading;
+    }
+    if(rightReading > yellowBMaxRight){
+      yellowBMaxRight = rightReading;
+    }
+    if(rightReading < yellowBMinRight){
+      yellowBMinRight = rightReading;
+    }
+  }
+
+  // Turn off both LEDs, we're done here
+  analogWrite(redPin, 0);
+  analogWrite(bluePin, 0);
 }
 
 void followColor(int targetColorID){
