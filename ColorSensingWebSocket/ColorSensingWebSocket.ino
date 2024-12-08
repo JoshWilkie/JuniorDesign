@@ -71,7 +71,7 @@ float yellowRMinLeft  = 10000.0;
 // const int IROutputPin = 0;
 const int IRInputPin = 0; // Analog in
 
-const float wallThreshold = 780.0;
+const float wallThreshold = 450.0;
 
 // Websocket Settings //
 char ssid[] = "tufts_eecs";
@@ -132,9 +132,13 @@ void setup() {
   // pinMode(battVoltPin, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
+  digitalWrite(LED_BUILTIN, LOW);
+
   reset();
 
   Serial.begin(9600);
+
+  digitalWrite(LED_BUILTIN, HIGH);
 
   // WiFi Setup //
   while (status != WL_CONNECTED) {
@@ -144,6 +148,7 @@ void setup() {
     // Connect to WPA/WPA2 network:
     status = WiFi.begin(ssid, pass);
   }
+  digitalWrite(LED_BUILTIN, LOW);
   // print the SSID of the network you're attached to:
   Serial.print("SSID: ");
   Serial.println(WiFi.SSID());
@@ -279,7 +284,7 @@ void loop() {
       }else if(message.endsWith("minMaxSizz")){
         collectMinMax();
       }else if(message.endsWith("resetColorSizz")){
-        resetColor();
+        // resetColor();
       }
     }
   }
@@ -296,12 +301,12 @@ void soloDemo(){
     delay(10);
   }
   // printToScreen("Going", "Forward", "To Wall");
-  // float ambientIR;
-  // for(int i = 0; i < 5; i++){
-  //   ambientIR += analogRead(IRInputPin);
-  //   delay(10);
-  // }
-  // ambientIR /= 5;
+  float ambientIR;
+  for(int i = 0; i < 5; i++){
+    ambientIR += analogRead(IRInputPin);
+    delay(10);
+  }
+  ambientIR /= 5;
 
   String outText = "Wall Detection Value is: ";
   // outText = outText + wallDetectionVal;
@@ -723,40 +728,40 @@ int getColor(int side){
   }
 }
 
-void resetColor(){
-  blackBMaxRight   = 0.00;
-  blackBMinRight   = 10000.0;
-  blackRMaxRight   = 0.00;
-  blackRMinRight   = 10000.0;
-  redBMaxRight     = 0.00;
-  redBMinRight     = 10000.0;
-  redRMaxRight     = 0.00;
-  redRMinRight     = 10000.0;
-  blueBMaxRight    = 0.00;
-  blueBMinRight    = 10000.0;
-  blueRMaxRight    = 0.00;
-  blueRMinRight    = 10000.0;
-  yellowBMaxRight  = 0.00;
-  yellowBMinRight  = 10000.0;
-  yellowRMaxRight  = 0.00;
-  yellowRMinRight  = 10000.0; 
-  blackBMaxLeft   = 0.00;
-  blackBMinLeft   = 10000.0;
-  blackRMaxLeft   = 0.00;
-  blackRMinLeft   = 10000.0;
-  redBMaxLeft     = 0.00;
-  redBMinLeft     = 10000.0;
-  redRMaxLeft     = 0.00;
-  redRMinLeft     = 10000.0;
-  blueBMaxLeft    = 0.00;
-  blueBMinLeft    = 10000.0;
-  blueRMaxLeft    = 0.00;
-  blueRMinLeft    = 10000.0;
-  yellowBMaxLeft  = 0.00;
-  yellowBMinLeft  = 10000.0;
-  yellowRMaxLeft  = 0.00;
-  yellowRMinLeft  = 10000.0;
-}
+// void resetColor(){
+//   blackBMaxRight   = 0.00;
+//   blackBMinRight   = 10000.0;
+//   blackRMaxRight   = 0.00;
+//   blackRMinRight   = 10000.0;
+//   redBMaxRight     = 0.00;
+//   redBMinRight     = 10000.0;
+//   redRMaxRight     = 0.00;
+//   redRMinRight     = 10000.0;
+//   blueBMaxRight    = 0.00;
+//   blueBMinRight    = 10000.0;
+//   blueRMaxRight    = 0.00;
+//   blueRMinRight    = 10000.0;
+//   yellowBMaxRight  = 0.00;
+//   yellowBMinRight  = 10000.0;
+//   yellowRMaxRight  = 0.00;
+//   yellowRMinRight  = 10000.0; 
+//   blackBMaxLeft   = 0.00;
+//   blackBMinLeft   = 10000.0;
+//   blackRMaxLeft   = 0.00;
+//   blackRMinLeft   = 10000.0;
+//   redBMaxLeft     = 0.00;
+//   redBMinLeft     = 10000.0;
+//   redRMaxLeft     = 0.00;
+//   redRMinLeft     = 10000.0;
+//   blueBMaxLeft    = 0.00;
+//   blueBMinLeft    = 10000.0;
+//   blueRMaxLeft    = 0.00;
+//   blueRMinLeft    = 10000.0;
+//   yellowBMaxLeft  = 0.00;
+//   yellowBMinLeft  = 10000.0;
+//   yellowRMaxLeft  = 0.00;
+//   yellowRMinLeft  = 10000.0;
+// }
 
 void collectMinMax(){
   float leftReading = 0;
