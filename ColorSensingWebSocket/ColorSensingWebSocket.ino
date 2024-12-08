@@ -113,7 +113,8 @@ void followColor(int targetColorID);
 float collectLight(int pin);
 void collectAmbient();
 
-void collectLight();
+void collectMinMax();
+void resetColor();
 
 void printToScreen(String text);
 
@@ -264,7 +265,7 @@ void loop() {
       }else if(message.endsWith("blueDemoSizz")){
         teamDemoBlue();
       }else if(message.endsWith("ambientSizz")){
-        collectAmbient();
+        // collectAmbient();
       }else if(message.endsWith("displayTestSizz")){
         printToScreen("Waiting", "For", "Companion");
       // }else if(message.endsWith("IRTestSizz")){
@@ -275,6 +276,10 @@ void loop() {
       //     Serial.print("\nRead in IR value: ");
       //     Serial.print(irRead);
       //   }
+      }else if(message.endsWith("minMaxSizz")){
+        collectMinMax();
+      }else if(message.endsWith("resetColorSizz")){
+        resetColor();
       }
     }
   }
@@ -718,17 +723,74 @@ int getColor(int side){
   }
 }
 
-void collectColor(){
+void resetColor(){
+  blackBMaxRight   = 0.00;
+  blackBMinRight   = 10000.0;
+  blackRMaxRight   = 0.00;
+  blackRMinRight   = 10000.0;
+  redBMaxRight     = 0.00;
+  redBMinRight     = 10000.0;
+  redRMaxRight     = 0.00;
+  redRMinRight     = 10000.0;
+  blueBMaxRight    = 0.00;
+  blueBMinRight    = 10000.0;
+  blueRMaxRight    = 0.00;
+  blueRMinRight    = 10000.0;
+  yellowBMaxRight  = 0.00;
+  yellowBMinRight  = 10000.0;
+  yellowRMaxRight  = 0.00;
+  yellowRMinRight  = 10000.0; 
+  blackBMaxLeft   = 0.00;
+  blackBMinLeft   = 10000.0;
+  blackRMaxLeft   = 0.00;
+  blackRMinLeft   = 10000.0;
+  redBMaxLeft     = 0.00;
+  redBMinLeft     = 10000.0;
+  redRMaxLeft     = 0.00;
+  redRMinLeft     = 10000.0;
+  blueBMaxLeft    = 0.00;
+  blueBMinLeft    = 10000.0;
+  blueRMaxLeft    = 0.00;
+  blueRMinLeft    = 10000.0;
+  yellowBMaxLeft  = 0.00;
+  yellowBMinLeft  = 10000.0;
+  yellowRMaxLeft  = 0.00;
+  yellowRMinLeft  = 10000.0;
+}
+
+void collectMinMax(){
   float leftReading = 0;
   float rightReading = 0;
   int redPin = rightRedPin;
   int bluePin = rightBluePin;
 
+  float blackRAvgLeft = 0;
+  float blackRAvgRight = 0;
+  float blackBAvgLeft = 0;
+  float blackBAvgRight = 0;
+
+  float redRAvgLeft = 0;
+  float redRAvgRight = 0;
+  float redBAvgLeft = 0;
+  float redBAvgRight = 0;
+
+  float blueRAvgLeft = 0;
+  float blueRAvgRight = 0;
+  float blueBAvgLeft = 0;
+  float blueBAvgRight = 0;
+
+  float yellowRAvgLeft = 0;
+  float yellowRAvgRight = 0;
+  float yellowBAvgLeft = 0;
+  float yellowBAvgRight = 0;
+
   // Calibrate min/max values for red LED on black surface
   // Turn on red LED both sides
   analogWrite(redPin, 172);
   analogWrite(bluePin, 0);
+  delay(250);
   for(int i = 0; i < 100; i++){
+    delay(50);
     leftReading = analogRead(leftPTPin);
     rightReading = analogRead(rightPTPin);
     if(leftReading > blackRMaxLeft){
@@ -743,13 +805,17 @@ void collectColor(){
     if(rightReading < blackRMinRight){
       blackRMinRight = rightReading;
     }
+    blackRAvgLeft += leftReading;
+    blackRAvgRight += rightReading;
   }
 
   // Calibrate min/max values for blue LED on black surface
   // Turn on blue LED both sides
   analogWrite(redPin, 0);
   analogWrite(bluePin, 172);
+  delay(250);
   for(int i = 0; i < 100; i++){
+    delay(50);
     leftReading = analogRead(leftPTPin);
     rightReading = analogRead(rightPTPin);
     if(leftReading > blackBMaxLeft){
@@ -764,17 +830,23 @@ void collectColor(){
     if(rightReading < blackBMinRight){
       blackBMinRight = rightReading;
     }
+    blackBAvgLeft += leftReading;
+    blackBAvgRight += rightReading;
   }
 
   // Turn on both LEDs to signify to change surface color
   analogWrite(redPin, 172);
   analogWrite(bluePin, 172);
 
+  delay(5000);
+
   // Calibrate min/max values for red LED on red surface
   // Turn on red LED both sides
   analogWrite(redPin, 172);
   analogWrite(bluePin, 0);
+  delay(250);
   for(int i = 0; i < 100; i++){
+    delay(50);
     leftReading = analogRead(leftPTPin);
     rightReading = analogRead(rightPTPin);
     if(leftReading > redRMaxLeft){
@@ -789,13 +861,17 @@ void collectColor(){
     if(rightReading < redRMinRight){
       redRMinRight = rightReading;
     }
+    redRAvgLeft += leftReading;
+    redRAvgRight += rightReading;
   }
 
   // Calibrate min/max values for blue LED on red surface
   // Turn on blue LED both sides
   analogWrite(redPin, 0);
   analogWrite(bluePin, 172);
+  delay(250);
   for(int i = 0; i < 100; i++){
+    delay(50);
     leftReading = analogRead(leftPTPin);
     rightReading = analogRead(rightPTPin);
     if(leftReading > redBMaxLeft){
@@ -810,17 +886,23 @@ void collectColor(){
     if(rightReading < redBMinRight){
       redBMinRight = rightReading;
     }
+    redBAvgLeft += leftReading;
+    redBAvgRight += rightReading;
   }
 
   // Turn on both LEDs to signify to change surface color
   analogWrite(redPin, 172);
   analogWrite(bluePin, 172);
 
+  delay(5000);
+
   // Calibrate min/max values for red LED on blue surface
   // Turn on red LED both sides
   analogWrite(redPin, 172);
   analogWrite(bluePin, 0);
+  delay(250);
   for(int i = 0; i < 100; i++){
+    delay(50);
     leftReading = analogRead(leftPTPin);
     rightReading = analogRead(rightPTPin);
     if(leftReading > blueRMaxLeft){
@@ -835,13 +917,17 @@ void collectColor(){
     if(rightReading < blueRMinRight){
       blueRMinRight = rightReading;
     }
+    blueRAvgLeft += leftReading;
+    blueRAvgRight += rightReading;
   }
 
   // Calibrate min/max values for blue LED on blue surface
   // Turn on blue LED both sides
   analogWrite(redPin, 0);
   analogWrite(bluePin, 172);
+  delay(250);
   for(int i = 0; i < 100; i++){
+    delay(50);
     leftReading = analogRead(leftPTPin);
     rightReading = analogRead(rightPTPin);
     if(leftReading > blueBMaxLeft){
@@ -856,17 +942,23 @@ void collectColor(){
     if(rightReading < blueBMinRight){
       blueBMinRight = rightReading;
     }
+    blueBAvgLeft += leftReading;
+    blueBAvgRight += rightReading;
   }
 
   // Turn on both LEDs to signify to change surface color
   analogWrite(redPin, 172);
   analogWrite(bluePin, 172);
 
+  delay(5000);
+
   // Calibrate min/max values for red LED on yellow surface
   // Turn on red LED both sides
   analogWrite(redPin, 172);
   analogWrite(bluePin, 0);
+  delay(250);
   for(int i = 0; i < 100; i++){
+    delay(50);
     leftReading = analogRead(leftPTPin);
     rightReading = analogRead(rightPTPin);
     if(leftReading > yellowRMaxLeft){
@@ -881,13 +973,17 @@ void collectColor(){
     if(rightReading < yellowRMinRight){
       yellowRMinRight = rightReading;
     }
+    yellowRAvgLeft += leftReading;
+    yellowRAvgRight += rightReading;
   }
 
   // Calibrate min/max values for blue LED on yellow surface
   // Turn on blue LED both sides
   analogWrite(redPin, 0);
   analogWrite(bluePin, 172);
+  delay(250);
   for(int i = 0; i < 100; i++){
+    delay(50);
     leftReading = analogRead(leftPTPin);
     rightReading = analogRead(rightPTPin);
     if(leftReading > yellowBMaxLeft){
@@ -902,11 +998,100 @@ void collectColor(){
     if(rightReading < yellowBMinRight){
       yellowBMinRight = rightReading;
     }
+    yellowBAvgLeft += leftReading;
+    yellowBAvgRight += rightReading;
   }
+
+  blackRAvgLeft /= 100;
+  blackRAvgRight /= 100;
+  blackBAvgLeft /= 100;
+  blackBAvgRight /= 100;
+
+  redRAvgLeft /= 100;
+  redRAvgRight /= 100;
+  redBAvgLeft /= 100;
+  redBAvgRight /= 100;
+
+  blueRAvgLeft /= 100;
+  blueRAvgRight /= 100;
+  blueBAvgLeft /= 100;
+  blueBAvgRight /= 100;
+
+  yellowRAvgLeft /= 100;
+  yellowRAvgRight /= 100;
+  yellowBAvgLeft /= 100;
+  yellowBAvgRight /= 100;
 
   // Turn off both LEDs, we're done here
   analogWrite(redPin, 0);
   analogWrite(bluePin, 0);
+
+  String tempText = "Black Surface Left Red LED Max: ";
+  String minText = " & Min: ";
+  String avgText = " & Avg: ";
+  String rightText = "\n Right LED Max: ";
+  String outText = tempText + blackRMaxLeft + minText + blackRMinLeft + avgText + blackRAvgLeft + rightText + blackRMaxRight + minText + blackRMinRight + avgText + blackRAvgRight;
+
+  // client.beginMessage(TYPE_TEXT);
+  // client.print(outText);
+  // client.endMessage();
+  Serial.print(outText);
+
+  tempText = "\nBlack Surface Left Blue LED Max: ";
+  outText = tempText + blackBMaxLeft + minText + blackBMinLeft + avgText + blackBAvgLeft + rightText + blackBMaxRight + minText + blackBMinRight + avgText + blackBAvgRight;
+
+  // client.beginMessage(TYPE_TEXT);
+  // client.print(outText);
+  // client.endMessage();
+  Serial.print(outText);
+  
+  tempText = "\nRed Surface Left Red LED Max: ";
+  outText = tempText + redRMaxLeft + minText + redRMinLeft + avgText + redRAvgLeft + rightText + redRMaxRight + minText + redRMinRight + avgText + redRAvgRight;
+
+  // client.beginMessage(TYPE_TEXT);
+  // client.print(outText);
+  // client.endMessage();
+  Serial.print(outText);
+  
+  tempText = "\nRed Surface Left Blue LED Max: ";
+  outText = tempText + redBMaxLeft + minText + redBMinLeft + avgText + redBAvgLeft + rightText + redBMaxRight + minText + redBMinRight + avgText + redBAvgRight;
+
+  // client.beginMessage(TYPE_TEXT);
+  // client.print(outText);
+  // client.endMessage();
+  Serial.print(outText);
+
+  tempText = "\nBlue Surface Left Red LED Max: ";
+  outText = tempText + blueRMaxLeft + minText + blueRMinLeft + avgText + blueRAvgLeft + rightText + blueRMaxRight + minText + blueRMinRight + avgText + blueRAvgRight;
+
+  // client.beginMessage(TYPE_TEXT);
+  // client.print(outText);
+  // client.endMessage();
+  Serial.print(outText);
+
+  tempText = "\nBlue Surface Left Blue LED Max: ";
+  outText = tempText + blueBMaxLeft + minText + blueBMinLeft + avgText + blueBAvgLeft + rightText + blueBMaxRight + minText + blueBMinRight + avgText + blueBAvgRight;
+
+  // client.beginMessage(TYPE_TEXT);
+  // client.print(outText);
+  // client.endMessage();
+  Serial.print(outText);
+
+  tempText = "\nYellow Surface Left Blue LED Max: ";
+  outText = tempText + yellowBMaxLeft + minText + yellowBMinLeft + avgText + yellowBAvgLeft + rightText + yellowBMaxRight + minText + yellowBMinRight + avgText + yellowBAvgRight;
+
+  // client.beginMessage(TYPE_TEXT);
+  // client.print(outText);
+  // client.endMessage();
+  Serial.print(outText);
+
+  tempText = "\nYellow Surface Left Red LED Max: ";
+  outText = tempText + yellowRMaxLeft + minText + yellowRMinLeft + avgText + yellowRAvgLeft + rightText + yellowRMaxRight + minText + yellowRMinRight + avgText + yellowRAvgRight;
+
+  // client.beginMessage(TYPE_TEXT);
+  // client.print(outText);
+  // client.endMessage();
+  Serial.print(outText);
 }
 
 void followColor(int targetColorID){
@@ -954,84 +1139,84 @@ void printToScreen(String text1, String text2, String text3){
   // display.startscrollright(0x10, 0x20);
 }
 
-void collectAmbient(){
-  blink();
-  blink();
-  digitalWrite(LED_BUILTIN, HIGH);
-  blackAmbient = collectLight(leftPTPin);
-  Serial.print("Black Ambient Light Read: ");
-  Serial.print(blackAmbient);
-  Serial.print("\n");
-  digitalWrite(LED_BUILTIN, LOW);
-  blink();
-  digitalWrite(LED_BUILTIN, HIGH);
-  redAmbient = collectLight(leftPTPin);
-  Serial.print("Red Ambient Light Read: ");
-  Serial.print(redAmbient);
-  Serial.print("\n");
-  digitalWrite(LED_BUILTIN, LOW);
-  blink();
-  digitalWrite(LED_BUILTIN, HIGH);
-  blueAmbient = collectLight(leftPTPin);
-  Serial.print("Blue Ambient Light Read: ");
-  Serial.print(blueAmbient);
-  Serial.print("\n");
-  digitalWrite(LED_BUILTIN, LOW);
-  blink();
-  digitalWrite(LED_BUILTIN, HIGH);
-  yellowAmbient = collectLight(leftPTPin);
-  Serial.print("Yellow Ambient Light Read: ");
-  Serial.print(yellowAmbient);
-  Serial.print("\n");
-  // digitalWrite(LED_BUILTIN, LOW);
-}
+// void collectAmbient(){
+//   blink();
+//   blink();
+//   digitalWrite(LED_BUILTIN, HIGH);
+//   blackAmbient = collectLight(leftPTPin);
+//   Serial.print("Black Ambient Light Read: ");
+//   Serial.print(blackAmbient);
+//   Serial.print("\n");
+//   digitalWrite(LED_BUILTIN, LOW);
+//   blink();
+//   digitalWrite(LED_BUILTIN, HIGH);
+//   redAmbient = collectLight(leftPTPin);
+//   Serial.print("Red Ambient Light Read: ");
+//   Serial.print(redAmbient);
+//   Serial.print("\n");
+//   digitalWrite(LED_BUILTIN, LOW);
+//   blink();
+//   digitalWrite(LED_BUILTIN, HIGH);
+//   blueAmbient = collectLight(leftPTPin);
+//   Serial.print("Blue Ambient Light Read: ");
+//   Serial.print(blueAmbient);
+//   Serial.print("\n");
+//   digitalWrite(LED_BUILTIN, LOW);
+//   blink();
+//   digitalWrite(LED_BUILTIN, HIGH);
+//   yellowAmbient = collectLight(leftPTPin);
+//   Serial.print("Yellow Ambient Light Read: ");
+//   Serial.print(yellowAmbient);
+//   Serial.print("\n");
+//   // digitalWrite(LED_BUILTIN, LOW);
+// }
 
-void blink(){
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(300);
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(300);
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(300);
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(300);
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(300);
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(300);
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(300);
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(300);
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(300);
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(300);
-}
+// void blink(){
+//   digitalWrite(LED_BUILTIN, HIGH);
+//   delay(300);
+//   digitalWrite(LED_BUILTIN, LOW);
+//   delay(300);
+//   digitalWrite(LED_BUILTIN, HIGH);
+//   delay(300);
+//   digitalWrite(LED_BUILTIN, LOW);
+//   delay(300);
+//   digitalWrite(LED_BUILTIN, HIGH);
+//   delay(300);
+//   digitalWrite(LED_BUILTIN, LOW);
+//   delay(300);
+//   digitalWrite(LED_BUILTIN, HIGH);
+//   delay(300);
+//   digitalWrite(LED_BUILTIN, LOW);
+//   delay(300);
+//   digitalWrite(LED_BUILTIN, HIGH);
+//   delay(300);
+//   digitalWrite(LED_BUILTIN, LOW);
+//   delay(300);
+// }
 
-float collectLight(int pin){
-  int totalRead = 0;
-  totalRead += analogRead(pin);
-  delay(100);
-  totalRead += analogRead(pin);
-  delay(100);
-  totalRead += analogRead(pin);
-  delay(100);
-  totalRead += analogRead(pin);
-  delay(100);
-  totalRead += analogRead(pin);
-  delay(100);
-  totalRead += analogRead(pin);
-  delay(100);
-  totalRead += analogRead(pin);
-  delay(100);
-  totalRead += analogRead(pin);
-  delay(100);
-  totalRead += analogRead(pin);
-  delay(100);
-  totalRead += analogRead(pin);
-  return (totalRead / 10.0);
-}
+// float collectLight(int pin){
+//   int totalRead = 0;
+//   totalRead += analogRead(pin);
+//   delay(100);
+//   totalRead += analogRead(pin);
+//   delay(100);
+//   totalRead += analogRead(pin);
+//   delay(100);
+//   totalRead += analogRead(pin);
+//   delay(100);
+//   totalRead += analogRead(pin);
+//   delay(100);
+//   totalRead += analogRead(pin);
+//   delay(100);
+//   totalRead += analogRead(pin);
+//   delay(100);
+//   totalRead += analogRead(pin);
+//   delay(100);
+//   totalRead += analogRead(pin);
+//   delay(100);
+//   totalRead += analogRead(pin);
+//   return (totalRead / 10.0);
+// }
 
 void forward(){
   // Serial.print("In forward\n");
