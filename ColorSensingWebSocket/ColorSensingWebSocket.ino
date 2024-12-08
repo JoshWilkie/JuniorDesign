@@ -12,12 +12,9 @@ const int motorLeftTop = 10; // Pin 15 on L293
 const int motorRightBottom = 6; // Pin 2 on L293
 const int motorRightTop = 3; // Pin 7 on L293
 
-// TODO: Update pins to actual pins on Arduino
-const int leftBluePin = 11; // Analog out
-const int leftRedPin = 5;
+const int bluePin = 11; // Analog out
+const int redPin = 5;
 const int leftPTPin = 3; // Analog in
-const int rightBluePin = 11; // Same as left out
-const int rightRedPin = 5;
 const int rightPTPin = 4; // Analog in
 
 const int maxPower = 100;
@@ -71,7 +68,7 @@ float yellowRMinLeft  = 10000.0;
 // const int IROutputPin = 0;
 const int IRInputPin = 0; // Analog in
 
-const float wallThreshold = 450.0;
+const float wallThreshold = 500.0;
 
 // Websocket Settings //
 char ssid[] = "tufts_eecs";
@@ -108,22 +105,22 @@ void soloDemo();
 void teamDemoRed();
 void teamDemoBlue();
 
+void getColor(int *leftID, int *rightID);
 void followColor(int targetColorID);
 
 float collectLight(int pin);
 void collectAmbient();
 
 void collectMinMax();
+void printMinMax();
 void resetColor();
 
 void printToScreen(String text);
 
 void setup() {
-  pinMode(leftBluePin, OUTPUT);
-  pinMode(leftRedPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
+  pinMode(redPin, OUTPUT);
   pinMode(leftPTPin, INPUT);
-  pinMode(rightBluePin, OUTPUT);
-  pinMode(rightRedPin, OUTPUT);
   pinMode(rightPTPin, INPUT);
   pinMode(motorLeftBottom, OUTPUT);
   pinMode(motorLeftTop, OUTPUT);
@@ -269,8 +266,6 @@ void loop() {
         teamDemoRed();
       }else if(message.endsWith("blueDemoSizz")){
         teamDemoBlue();
-      }else if(message.endsWith("ambientSizz")){
-        // collectAmbient();
       }else if(message.endsWith("displayTestSizz")){
         printToScreen("Waiting", "For", "Companion");
       // }else if(message.endsWith("IRTestSizz")){
@@ -283,8 +278,8 @@ void loop() {
       //   }
       }else if(message.endsWith("minMaxSizz")){
         collectMinMax();
-      }else if(message.endsWith("resetColorSizz")){
-        // resetColor();
+      }else if(message.endsWith("printMinMaxSizz")){
+        printMinMax();
       }
     }
   }
@@ -294,75 +289,83 @@ void loop() {
 }
 
 void soloDemo(){
-  // Go forward until reaching wall
+  String outText = "Wall Detection Value is: ";
   float wallDetectionVal = 0;
+  // Read in and trash first 50 wall IR input readings
   for(int i = 0; i < 50; i++){
     wallDetectionVal = analogRead(IRInputPin);
     delay(10);
-  }
-  // printToScreen("Going", "Forward", "To Wall");
-  float ambientIR;
-  for(int i = 0; i < 5; i++){
-    ambientIR += analogRead(IRInputPin);
-    delay(10);
-  }
-  ambientIR /= 5;
-
-  String outText = "Wall Detection Value is: ";
-  // outText = outText + wallDetectionVal;
-  
-  client.beginMessage(TYPE_TEXT);
-  client.print(outText);
-  client.endMessage();
-  delay(50);
-
-  forward();
-  while(wallDetectionVal < wallThreshold){
-    wallDetectionVal = 0;
-    for(int i = 0; i < 5; i++){
-      wallDetectionVal += analogRead(IRInputPin);
-      delay(10);
-    }
-    wallDetectionVal /= 5;
-    // Serial.print("\nwallDetectionVal is: ");
-    // Serial.print(wallDetectionVal);
-
-    // outText = "Wall Detection Value is: " + wallDetectionVal;
     
     client.beginMessage(TYPE_TEXT);
     client.print(outText + wallDetectionVal);
     client.endMessage();
-    delay(50);
+  }
+  printToScreen("Going", "Forward", "To Wall");
+  // float ambientIR;
+  // for(int i = 0; i < 5; i++){
+  //   ambientIR += analogRead(IRInputPin);
+  //   delay(10);
+  // }
+  // ambientIR /= 5;
+
+  // outText = outText + wallDetectionVal;
+  
+  client.beginMessage(TYPE_TEXT);
+  client.print(outText + wallDetectionVal);
+  client.endMessage();
+
+  // Go forward until reaching wall
+  forward();
+  // while(wallDetectionVal > wallThreshold){
+  //   wallDetectionVal = 0;
+  //   for(int i = 0; i < 5; i++){
+  //     wallDetectionVal += analogRead(IRInputPin);
+  //     delay(10);
+  //   }
+  //   wallDetectionVal /= 5;
+  //   // Serial.print("\nwallDetectionVal is: ");
+  //   // Serial.print(wallDetectionVal);
+
+  //   // outText = "Wall Detection Value is: " + wallDetectionVal;
+    
+  //   client.beginMessage(TYPE_TEXT);
+  //   client.print(outText + wallDetectionVal);
+  //   client.endMessage();
+  // }
+  while(wallDetectionVal > wallThreshold){
+    wallDetectionVal = analogRead(IRInputPin);
+    delay(10);
   }
   reset();
 
   // Spin in place then go back towards where we started
-  // printToScreen("Turning", "Around", "");
-  delay(200);
+  printToScreen("Turning", "Around", "");
+  delay(100);
   rotateRight();
-  delay(2000);
+  // How long we rotate for
+  delay(2300);
   reset();
-  delay(200);
-  // printToScreen("Finding", "Red Lane", "");
+  delay(100);
+  printToScreen("Finding", "Red Lane", "");
   forward();
 
-  delay(4000);
-  reset();
+  // delay(4000);
+  // reset();
 
   // Go forward until we reach red
   int leftColorID = 0;
   int rightColorID = 0;
   while(rightColorID != 2){
-    rightColorID = getColor(1);
+    getColor(&leftColorID, &rightColorID);
   }
   reset();
 
   printToScreen("Turning", "Onto Red", "Lane");
-  delay(200);
+  delay(100);
   rotateLeft();
-  delay(800);
+  delay(1200);
   reset();
-  delay(200);
+  delay(100);
 
   // Follow red
   printToScreen("Following", "Red Lane", "");
@@ -370,11 +373,12 @@ void soloDemo(){
 
   // Spin in place then go towards yellow line
   printToScreen("Turning", "To Yellow", "Lane");
-  delay(200);
+  delay(100);
   rotateLeft();
-  delay(800);
+  // TODO: Make sure good turn radius (probably want to overturn)
+  delay(1400);
   reset();
-  delay(200);
+  delay(100);
   printToScreen("Finding", "Yellow", "Lane");
   forward();
 
@@ -382,17 +386,17 @@ void soloDemo(){
   leftColorID = 0;
   rightColorID = 0;
   while(rightColorID != 4){
-    rightColorID = getColor(1);
+    getColor(&leftColorID, &rightColorID);
   }
   reset();
 
   // Turn towards yellow line
   printToScreen("Turning", "Onto Yel-", "low Lane");
-  delay(200);
+  delay(100);
   rotateLeft();
-  delay(800);
+  delay(1200);
   reset();
-  delay(200);
+  delay(100);
 
   // Follow yellow
   printToScreen("Following", "Yellow", "Lane");
@@ -401,17 +405,18 @@ void soloDemo(){
 
   // Turn towards original position
   printToScreen("Turning", "Towards", "Origin");
-  delay(200);
+  delay(100);
   rotateLeft();
-  delay(800);
+  // Tweak turn duration
+  delay(1200);
   reset();
-  delay(200);
+  delay(100);
   printToScreen("Returning", "To Origin", "");
   forward();
 
   wallDetectionVal = analogRead(IRInputPin);
   // Go forward until wall
-  while(wallDetectionVal < wallThreshold){
+  while(wallDetectionVal > wallThreshold){
     wallDetectionVal = analogRead(IRInputPin);
     delay(10);
   }
@@ -422,309 +427,55 @@ void soloDemo(){
 }
 
 void teamDemoRed(){
-  // Go forward until reaching wall
-  forward();
-  float wallDetectionVal = 0;
-  while(wallDetectionVal < wallThreshold){
-    wallDetectionVal = analogRead(IRInputPin);
-    delay(10);
-  }
-
-  // Spin in place then go back towards where we started
-  reset();
-  delay(200);
-  rotateRight();
-  delay(1500);
-  reset();
-  delay(200);
-  forward();
-
-  // Go forward until we reach red
-  int leftColorID = 0;
-  int rightColorID = 0;
-  while(rightColorID != 2){
-    rightColorID = getColor(1);
-  }
-
-  reset();
-  delay(200);
-  rotateLeft();
-  delay(800);
-  reset();
-  delay(200);
-
-  // Send message to companion bot that we found our line
-  client.beginMessage(TYPE_TEXT);
-  client.print("foundRedSizz");
-  client.endMessage();
-
-  // Follow red
-  followColor(2);
-
-  // Spin in place then go towards yellow line
-  reset();
-  delay(200);
-  rotateLeft();
-  delay(800);
-  reset();
-  delay(200);
-  forward();
-
-  // Go forward until we reach yellow
-  leftColorID = 0;
-  rightColorID = 0;
-  while(rightColorID != 4){
-    rightColorID = getColor(1);
-  }
-
-  // Turn towards yellow line
-  reset();
-  delay(200);
-  rotateLeft();
-  delay(800);
-  reset();
-  delay(200);
-
-  String message = "";
-  while(!message.endsWith("foundBlueSizz")){
-    int messageSize = client.parseMessage();
-    if (messageSize > 0) {
-      String message = client.readString();
-    }
-  }
-
-  client.beginMessage(TYPE_TEXT);
-  client.print("acknowledgedSizz");
-  client.endMessage();
-
-  // Follow yellow
-  followColor(4);
-
-  // Turn towards original position
-  reset();
-  delay(200);
-  rotateLeft();
-  delay(800);
-  reset();
-  delay(200);
-  forward();
-
-  wallDetectionVal = analogRead(IRInputPin);
-  // Go forward until wall
-  while(wallDetectionVal < wallThreshold){
-    wallDetectionVal = analogRead(IRInputPin);
-    delay(10);
-  }
-
-  // Now back where we started
-  reset();
-
-  client.beginMessage(TYPE_TEXT);
-  client.print("bot1ReturnedSizz");
-  client.endMessage();
-
-  while(!message.endsWith("bot2ReturnedSizz")){
-    int messageSize = client.parseMessage();
-    if (messageSize > 0) {
-      String message = client.readString();
-    }
-  }
-
-  client.beginMessage(TYPE_TEXT);
-  client.print("acknowledgedSizz");
-  client.endMessage();
+  
 }
 
 void teamDemoBlue(){
-  // Wait for companion bot to find red
-  String message = "";
-  while(!message.endsWith("foundRedSizz")){
-    int messageSize = client.parseMessage();
-    if (messageSize > 0) {
-      String message = client.readString();
-    }
-  }
-
-  // Go forward until reaching wall
-  forward();
-  float wallDetectionVal = 0;
-  while(wallDetectionVal < wallThreshold){
-    wallDetectionVal = analogRead(IRInputPin);
-    delay(10);
-  }
-
-  // Spin in place then go back towards where we started
-  reset();
-  delay(200);
-  rotateLeft();
-  delay(1500);
-  reset();
-  delay(200);
-  forward();
-
-  // Go forward until we reach blue
-  int leftColorID = 0;
-  int rightColorID = 0;
-  while(leftColorID != 3){
-    leftColorID = getColor(1);
-  }
-
-  reset();
-  delay(200);
-  rotateRight();
-  delay(800);
-  reset();
-  delay(200);
-
-  // Send message to companion bot that we found our line
-  client.beginMessage(TYPE_TEXT);
-  client.print("foundBlueSizz");
-  client.endMessage();
-
-  // Follow blue
-  followColor(3);
-
-  // Spin in place then go towards yellow line
-  reset();
-  delay(200);
-  rotateRight();
-  delay(800);
-  reset();
-  delay(200);
-  forward();
-
-  // Go forward until we reach yellow
-  leftColorID = 0;
-  rightColorID = 0;
-  while(leftColorID != 4){
-    leftColorID = getColor(1);
-  }
-
-  // Turn towards yellow line
-  reset();
-  delay(200);
-  rotateRight();
-  delay(800);
-  reset();
-  delay(200);
-
-  while(!message.endsWith("bot1ReturnedSizz")){
-    int messageSize = client.parseMessage();
-    if (messageSize > 0) {
-      String message = client.readString();
-    }
-  }
-
-  // Follow yellow
-  followColor(4);
-
-  // Turn towards original position
-  reset();
-  delay(200);
-  rotateRight();
-  delay(800);
-  reset();
-  delay(200);
-  forward();
-
-  wallDetectionVal = analogRead(IRInputPin);
-  // Go forward until wall
-  while(wallDetectionVal < wallThreshold){
-    wallDetectionVal = analogRead(IRInputPin);
-    delay(10);
-  }
-
-  // Now back where we started
-  reset();
-
-  client.beginMessage(TYPE_TEXT);
-  client.print("bot2ReturnedSizz");
-  client.endMessage();
+  
 }
 
-int getColor(int side){
-  int bluePin = 0;
-  int redPin = 0;
-  int PTPin = 0;
-  float blackBMax;
-  float blackBMin;
-  float blackRMax;
-  float blackRMin;
-  float redBMax;
-  float redBMin;
-  float redRMax;
-  float redRMin;
-  float blueBMax;
-  float blueBMin;
-  float blueRMax;
-  float blueRMin;
-  float yellowBMax;
-  float yellowBMin;
-  float yellowRMax;
-  float yellowRMin;
-  if(side == 0){
-    bluePin     = leftBluePin;
-    redPin      = leftRedPin;
-    PTPin       = leftPTPin;
-    blackBMax   = blackBMaxLeft;
-    blackBMin   = blackBMinLeft;
-    blackRMax   = blackRMaxLeft;
-    blackRMin   = blackRMinLeft;
-    redBMax     = redBMaxLeft;
-    redBMin     = redBMinLeft;
-    redRMax     = redRMaxLeft;
-    redRMin     = redRMinLeft;
-    blueBMax    = blueBMaxLeft;
-    blueBMin    = blueBMinLeft;
-    blueRMax    = blueRMaxLeft;
-    blueRMin    = blueRMinLeft;
-    yellowBMax  = yellowBMaxLeft;
-    yellowBMin  = yellowBMinLeft;
-    yellowRMax  = yellowRMaxLeft;
-    yellowRMin  = yellowRMinLeft;
-  }else{
-    bluePin     = rightBluePin;
-    redPin      = rightRedPin;
-    PTPin       = rightPTPin;
-    blackBMax   = blackBMaxRight;
-    blackBMin   = blackBMinRight;
-    blackRMax   = blackRMaxRight;
-    blackRMin   = blackRMinRight;
-    redBMax     = redBMaxRight;
-    redBMin     = redBMinRight;
-    redRMax     = redRMaxRight;
-    redRMin     = redRMinRight;
-    blueBMax    = blueBMaxRight;
-    blueBMin    = blueBMinRight;
-    blueRMax    = blueRMaxRight;
-    blueRMin    = blueRMinRight;
-    yellowBMax  = yellowBMaxRight;
-    yellowBMin  = yellowBMinRight;
-    yellowRMax  = yellowRMaxRight;
-    yellowRMin  = yellowRMinRight;
-  }
-  int colorDelay = 12;
-  digitalWrite(bluePin, HIGH);
-  digitalWrite(redPin, LOW);
+void getColor(int *leftID, int *rightID){
+  int colorDelay = 50;
+  // Flash blue on
+  analogWrite(bluePin, 172);
+  analogWrite(redPin, 0);
   delay(colorDelay);
-  float blueReading = analogRead(PTPin);
+  // Read blue for right and left
+  float leftBlueReading = analogRead(leftPTPin);
+  float rightBlueReading = analogRead(rightPTPin);
   delay(colorDelay);
-  digitalWrite(bluePin, LOW);
-  digitalWrite(redPin, HIGH);
+  // Flash red on
+  digitalWrite(bluePin, 0);
+  digitalWrite(redPin, 172);
   delay(colorDelay);
-  float redReading = analogRead(PTPin);
+  // Read red for right and left
+  float leftRedReading = analogRead(leftPTPin);
+  float rightRedReading = analogRead(rightPTPin);
   delay(colorDelay);
-  digitalWrite(bluePin, LOW);
-  digitalWrite(redPin, LOW);
+  // Turn off both LEDs
+  digitalWrite(bluePin, 0);
+  digitalWrite(redPin, 0);
 
-  if((blueReading - blackAmbient) < blackBMax && (blueReading - blackAmbient) > blackBMin && (redReading - blackAmbient) < blackRMax && (redReading - blackAmbient) > blackRMin){
-    return 1; // Reads Black
-  }else if((blueReading - redAmbient) < redBMax && (blueReading - redAmbient) > redBMin && (redReading - redAmbient) < redRMax && (redReading - redAmbient) > redRMin){
-    return 2; // Reads Red
-  }else if((blueReading - blueAmbient) < blueBMax && (blueReading - blueAmbient) > blueBMin && (redReading - blueAmbient) < blueRMax && (redReading - blueAmbient) > blueRMin){
-    return 3; // Reads Blue
-  }else if((blueReading - yellowAmbient) < yellowBMax && (blueReading - yellowAmbient) > yellowBMin && (redReading - yellowAmbient) < yellowRMax && (redReading - yellowAmbient) > yellowRMin){
-    return 4; // Reads Yellow
+  // Code for checking left color
+  if(leftBlueReading < blackBMaxLeft && leftBlueReading > blackBMinLeft && leftRedReading < blackRMaxLeft && leftRedReading > blackRMinLeft){
+    *leftID = 1; // Reads Black
+  }else if(leftBlueReading < redBMaxLeft && leftBlueReading > redBMinLeft && leftRedReading < redRMaxLeft && leftRedReading > redRMinLeft){
+    *leftID = 2; // Reads Red
+  }else if(leftBlueReading < blueBMaxLeft && leftBlueReading > blueBMinLeft && leftRedReading < blueRMaxLeft && leftRedReading > blueRMinLeft){
+    *leftID = 3; // Reads Blue
+  }else if(leftBlueReading < yellowBMaxLeft && leftBlueReading > yellowBMinLeft && leftRedReading < yellowRMaxLeft && leftRedReading > yellowRMinLeft){
+    *leftID = 4; // Reads Yellow
+  }
+
+  // Code for checking right color
+  if(rightBlueReading < blackBMaxRight && rightBlueReading > blackBMinRight && rightRedReading < blackRMaxRight && rightRedReading > blackRMinRight){
+    *rightID = 1; // Reads Black
+  }else if(rightBlueReading < redBMaxRight && rightBlueReading > redBMinRight && rightRedReading < redRMaxRight && rightRedReading > redRMinRight){
+    *rightID = 2; // Reads Red
+  }else if(rightBlueReading < blueBMaxRight && rightBlueReading > blueBMinRight && rightRedReading < blueRMaxRight && rightRedReading > blueRMinRight){
+    *rightID = 3; // Reads Blue
+  }else if(rightBlueReading < yellowBMaxRight && rightBlueReading > yellowBMinRight && rightRedReading < yellowRMaxRight && rightRedReading > yellowRMinRight){
+    *rightID = 4; // Reads Yellow
   }
 }
 
@@ -766,28 +517,6 @@ int getColor(int side){
 void collectMinMax(){
   float leftReading = 0;
   float rightReading = 0;
-  int redPin = rightRedPin;
-  int bluePin = rightBluePin;
-
-  float blackRAvgLeft = 0;
-  float blackRAvgRight = 0;
-  float blackBAvgLeft = 0;
-  float blackBAvgRight = 0;
-
-  float redRAvgLeft = 0;
-  float redRAvgRight = 0;
-  float redBAvgLeft = 0;
-  float redBAvgRight = 0;
-
-  float blueRAvgLeft = 0;
-  float blueRAvgRight = 0;
-  float blueBAvgLeft = 0;
-  float blueBAvgRight = 0;
-
-  float yellowRAvgLeft = 0;
-  float yellowRAvgRight = 0;
-  float yellowBAvgLeft = 0;
-  float yellowBAvgRight = 0;
 
   // Calibrate min/max values for red LED on black surface
   // Turn on red LED both sides
@@ -810,8 +539,6 @@ void collectMinMax(){
     if(rightReading < blackRMinRight){
       blackRMinRight = rightReading;
     }
-    blackRAvgLeft += leftReading;
-    blackRAvgRight += rightReading;
   }
 
   // Calibrate min/max values for blue LED on black surface
@@ -835,8 +562,6 @@ void collectMinMax(){
     if(rightReading < blackBMinRight){
       blackBMinRight = rightReading;
     }
-    blackBAvgLeft += leftReading;
-    blackBAvgRight += rightReading;
   }
 
   // Turn on both LEDs to signify to change surface color
@@ -866,8 +591,6 @@ void collectMinMax(){
     if(rightReading < redRMinRight){
       redRMinRight = rightReading;
     }
-    redRAvgLeft += leftReading;
-    redRAvgRight += rightReading;
   }
 
   // Calibrate min/max values for blue LED on red surface
@@ -891,8 +614,6 @@ void collectMinMax(){
     if(rightReading < redBMinRight){
       redBMinRight = rightReading;
     }
-    redBAvgLeft += leftReading;
-    redBAvgRight += rightReading;
   }
 
   // Turn on both LEDs to signify to change surface color
@@ -922,8 +643,6 @@ void collectMinMax(){
     if(rightReading < blueRMinRight){
       blueRMinRight = rightReading;
     }
-    blueRAvgLeft += leftReading;
-    blueRAvgRight += rightReading;
   }
 
   // Calibrate min/max values for blue LED on blue surface
@@ -947,8 +666,6 @@ void collectMinMax(){
     if(rightReading < blueBMinRight){
       blueBMinRight = rightReading;
     }
-    blueBAvgLeft += leftReading;
-    blueBAvgRight += rightReading;
   }
 
   // Turn on both LEDs to signify to change surface color
@@ -978,8 +695,6 @@ void collectMinMax(){
     if(rightReading < yellowRMinRight){
       yellowRMinRight = rightReading;
     }
-    yellowRAvgLeft += leftReading;
-    yellowRAvgRight += rightReading;
   }
 
   // Calibrate min/max values for blue LED on yellow surface
@@ -1003,108 +718,163 @@ void collectMinMax(){
     if(rightReading < yellowBMinRight){
       yellowBMinRight = rightReading;
     }
-    yellowBAvgLeft += leftReading;
-    yellowBAvgRight += rightReading;
   }
-
-  blackRAvgLeft /= 100;
-  blackRAvgRight /= 100;
-  blackBAvgLeft /= 100;
-  blackBAvgRight /= 100;
-
-  redRAvgLeft /= 100;
-  redRAvgRight /= 100;
-  redBAvgLeft /= 100;
-  redBAvgRight /= 100;
-
-  blueRAvgLeft /= 100;
-  blueRAvgRight /= 100;
-  blueBAvgLeft /= 100;
-  blueBAvgRight /= 100;
-
-  yellowRAvgLeft /= 100;
-  yellowRAvgRight /= 100;
-  yellowBAvgLeft /= 100;
-  yellowBAvgRight /= 100;
 
   // Turn off both LEDs, we're done here
   analogWrite(redPin, 0);
   analogWrite(bluePin, 0);
+}
 
+void printMinMax(){
   String tempText = "Black Surface Left Red LED Max: ";
   String minText = " & Min: ";
-  String avgText = " & Avg: ";
+  // String avgText = " & Avg: ";
   String rightText = "\n Right LED Max: ";
-  String outText = tempText + blackRMaxLeft + minText + blackRMinLeft + avgText + blackRAvgLeft + rightText + blackRMaxRight + minText + blackRMinRight + avgText + blackRAvgRight;
+  String outText = tempText + blackRMaxLeft + minText + blackRMinLeft + rightText + blackRMaxRight + minText + blackRMinRight;
 
-  // client.beginMessage(TYPE_TEXT);
-  // client.print(outText);
-  // client.endMessage();
   Serial.print(outText);
 
   tempText = "\nBlack Surface Left Blue LED Max: ";
-  outText = tempText + blackBMaxLeft + minText + blackBMinLeft + avgText + blackBAvgLeft + rightText + blackBMaxRight + minText + blackBMinRight + avgText + blackBAvgRight;
+  outText = tempText + blackBMaxLeft + minText + blackBMinLeft + rightText + blackBMaxRight + minText + blackBMinRight;
 
-  // client.beginMessage(TYPE_TEXT);
-  // client.print(outText);
-  // client.endMessage();
   Serial.print(outText);
   
   tempText = "\nRed Surface Left Red LED Max: ";
-  outText = tempText + redRMaxLeft + minText + redRMinLeft + avgText + redRAvgLeft + rightText + redRMaxRight + minText + redRMinRight + avgText + redRAvgRight;
+  outText = tempText + redRMaxLeft + minText + redRMinLeft + rightText + redRMaxRight + minText + redRMinRight;
 
-  // client.beginMessage(TYPE_TEXT);
-  // client.print(outText);
-  // client.endMessage();
   Serial.print(outText);
   
   tempText = "\nRed Surface Left Blue LED Max: ";
-  outText = tempText + redBMaxLeft + minText + redBMinLeft + avgText + redBAvgLeft + rightText + redBMaxRight + minText + redBMinRight + avgText + redBAvgRight;
+  outText = tempText + redBMaxLeft + minText + redBMinLeft + rightText + redBMaxRight + minText + redBMinRight;
 
-  // client.beginMessage(TYPE_TEXT);
-  // client.print(outText);
-  // client.endMessage();
   Serial.print(outText);
 
   tempText = "\nBlue Surface Left Red LED Max: ";
-  outText = tempText + blueRMaxLeft + minText + blueRMinLeft + avgText + blueRAvgLeft + rightText + blueRMaxRight + minText + blueRMinRight + avgText + blueRAvgRight;
+  outText = tempText + blueRMaxLeft + minText + blueRMinLeft + rightText + blueRMaxRight + minText + blueRMinRight;
 
-  // client.beginMessage(TYPE_TEXT);
-  // client.print(outText);
-  // client.endMessage();
   Serial.print(outText);
 
   tempText = "\nBlue Surface Left Blue LED Max: ";
-  outText = tempText + blueBMaxLeft + minText + blueBMinLeft + avgText + blueBAvgLeft + rightText + blueBMaxRight + minText + blueBMinRight + avgText + blueBAvgRight;
+  outText = tempText + blueBMaxLeft + minText + blueBMinLeft + rightText + blueBMaxRight + minText + blueBMinRight;
 
-  // client.beginMessage(TYPE_TEXT);
-  // client.print(outText);
-  // client.endMessage();
   Serial.print(outText);
 
   tempText = "\nYellow Surface Left Blue LED Max: ";
-  outText = tempText + yellowBMaxLeft + minText + yellowBMinLeft + avgText + yellowBAvgLeft + rightText + yellowBMaxRight + minText + yellowBMinRight + avgText + yellowBAvgRight;
+  outText = tempText + yellowBMaxLeft + minText + yellowBMinLeft + rightText + yellowBMaxRight + minText + yellowBMinRight;
 
-  // client.beginMessage(TYPE_TEXT);
-  // client.print(outText);
-  // client.endMessage();
   Serial.print(outText);
 
   tempText = "\nYellow Surface Left Red LED Max: ";
-  outText = tempText + yellowRMaxLeft + minText + yellowRMinLeft + avgText + yellowRAvgLeft + rightText + yellowRMaxRight + minText + yellowRMinRight + avgText + yellowRAvgRight;
+  outText = tempText + yellowRMaxLeft + minText + yellowRMinLeft + rightText + yellowRMaxRight + minText + yellowRMinRight;
 
-  // client.beginMessage(TYPE_TEXT);
-  // client.print(outText);
-  // client.endMessage();
   Serial.print(outText);
 }
 
+// void minMaxHelper(int color){
+//   float *BMaxLeft;
+//   float *BMinLeft;
+//   float *BMaxRight;
+//   float *BMinRight;
+//   float *RMaxLeft;
+//   float *RMinLeft;
+//   float *RMaxRight;
+//   float *RMinRight;
+//   if(color == 1){
+//     BMaxLeft  = &blackBMaxLeft;
+//     BMinLeft  = &blackBMinLeft;
+//     BMaxRight = &blackBMaxRight;
+//     BMinRight = &blackBMinRight;
+//     RMaxLeft  = &blackRMaxLeft;
+//     RMinLeft  = &blackRMinLeft;
+//     RMaxRight = &blackRMaxRight;
+//     RMinRight = &blackRMinRight;
+//   }else if(color == 2){
+//     BMaxLeft  = redBMaxLeft;
+//     BMinLeft  = redBMinLeft;
+//     BMaxRight = redBMaxRight;
+//     BMinRight = redBMinRight;
+//     RMaxLeft  = redRMaxLeft;
+//     RMinLeft  = redRMinLeft;
+//     RMaxRight = redRMaxRight;
+//     RMinRight = redRMinRight;
+//   }else if (color == 3){
+//     BMaxLeft  = blueBMaxLeft;
+//     BMinLeft  = blueBMinLeft;
+//     BMaxRight = blueBMaxRight;
+//     BMinRight = blueBMinRight;
+//     RMaxLeft  = blueRMaxLeft;
+//     RMinLeft  = blueRMinLeft;
+//     RMaxRight = blueRMaxRight;
+//     RMinRight = blueRMinRight;
+//   }else{
+//     BMaxLeft  = yellowBMaxLeft;
+//     BMinLeft  = yellowBMinLeft;
+//     BMaxRight = yellowBMaxRight;
+//     BMinRight = yellowBMinRight;
+//     RMaxLeft  = yellowRMaxLeft;
+//     RMinLeft  = yellowRMinLeft;
+//     RMaxRight = yellowRMaxRight;
+//     RMinRight = yellowRMinRight;
+//   }
+//   analogWrite(redPin, 172);
+//   analogWrite(bluePin, 0);
+//   delay(250);
+//   for(int i = 0; i < 100; i++){
+//     delay(50);
+//     leftReading = analogRead(leftPTPin);
+//     rightReading = analogRead(rightPTPin);
+//     if(leftReading > blackRMaxLeft){
+//       blackRMaxLeft = leftReading;
+//     }
+//     if(leftReading < blackRMinLeft){
+//       blackRMinLeft = leftReading;
+//     }
+//     if(rightReading > blackRMaxRight){
+//       blackRMaxRight = rightReading;
+//     }
+//     if(rightReading < blackRMinRight){
+//       blackRMinRight = rightReading;
+//     }
+//   }
+
+//   // Calibrate min/max values for blue LED on black surface
+//   // Turn on blue LED both sides
+//   analogWrite(redPin, 0);
+//   analogWrite(bluePin, 172);
+//   delay(250);
+//   for(int i = 0; i < 100; i++){
+//     delay(50);
+//     leftReading = analogRead(leftPTPin);
+//     rightReading = analogRead(rightPTPin);
+//     if(leftReading > blackBMaxLeft){
+//       blackBMaxLeft = leftReading;
+//     }
+//     if(leftReading < blackBMinLeft){
+//       blackBMinLeft = leftReading;
+//     }
+//     if(rightReading > blackBMaxRight){
+//       blackBMaxRight = rightReading;
+//     }
+//     if(rightReading < blackBMinRight){
+//       blackBMinRight = rightReading;
+//     }
+//   }
+
+//   // Turn on both LEDs to signify to change surface color
+//   analogWrite(redPin, 172);
+//   analogWrite(bluePin, 172);
+
+//   delay(5000);
+// }
+
+// TODO: Update followColor to use logic on which side is black and which side is on color, turn accordingly with color updates
 void followColor(int targetColorID){
   // Follow
   float wallDetectionVal = analogRead(IRInputPin);
-  while(wallDetectionVal < wallThreshold){
-    int leftColorID = getColor(0);
-    int rightColorID = getColor(1);
+  int leftColorID = 0;
+  int rightColorID = 0;
+  while(wallDetectionVal > wallThreshold){
+    getColor(&leftColorID, &rightColorID);
     // Went too far right
     if(leftColorID != targetColorID){
       turnLeft();
@@ -1225,9 +995,9 @@ void printToScreen(String text1, String text2, String text3){
 
 void forward(){
   // Serial.print("In forward\n");
-  analogWrite(motorRightTop, maxPower);
+  analogWrite(motorRightTop, midPower);
   digitalWrite(motorRightBottom,LOW);
-  analogWrite(motorLeftTop, maxPower);
+  analogWrite(motorLeftTop, midPower);
   digitalWrite(motorLeftBottom,LOW);
 }
 
