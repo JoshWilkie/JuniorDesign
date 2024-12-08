@@ -30,7 +30,6 @@ float redAmbient = 0.0;
 float blueAmbient = 0.0;
 float yellowAmbient = 0.0;
 
-// TODO - Find actual min max values
 float blackBMaxRight   = 0.00;
 float blackBMinRight   = 10000.0;
 float blackRMaxRight   = 0.00;
@@ -107,6 +106,7 @@ void teamDemoBlue();
 
 void getColor(int *leftID, int *rightID);
 void followColor(int targetColorID);
+void testColor();
 
 float collectLight(int pin);
 void collectAmbient();
@@ -280,6 +280,8 @@ void loop() {
         collectMinMax();
       }else if(message.endsWith("printMinMaxSizz")){
         printMinMax();
+      }else if(message.endsWith("testColorSizz")){
+        testColor();
       }
     }
   }
@@ -435,7 +437,7 @@ void teamDemoBlue(){
 }
 
 void getColor(int *leftID, int *rightID){
-  int colorDelay = 50;
+  int colorDelay = 200;
   // Flash blue on
   analogWrite(bluePin, 172);
   analogWrite(redPin, 0);
@@ -443,7 +445,6 @@ void getColor(int *leftID, int *rightID){
   // Read blue for right and left
   float leftBlueReading = analogRead(leftPTPin);
   float rightBlueReading = analogRead(rightPTPin);
-  delay(colorDelay);
   // Flash red on
   digitalWrite(bluePin, 0);
   digitalWrite(redPin, 172);
@@ -451,7 +452,6 @@ void getColor(int *leftID, int *rightID){
   // Read red for right and left
   float leftRedReading = analogRead(leftPTPin);
   float rightRedReading = analogRead(rightPTPin);
-  delay(colorDelay);
   // Turn off both LEDs
   digitalWrite(bluePin, 0);
   digitalWrite(redPin, 0);
@@ -459,23 +459,37 @@ void getColor(int *leftID, int *rightID){
   // Code for checking left color
   if(leftBlueReading < blackBMaxLeft && leftBlueReading > blackBMinLeft && leftRedReading < blackRMaxLeft && leftRedReading > blackRMinLeft){
     *leftID = 1; // Reads Black
+    Serial.print("Left Found Black\n");
   }else if(leftBlueReading < redBMaxLeft && leftBlueReading > redBMinLeft && leftRedReading < redRMaxLeft && leftRedReading > redRMinLeft){
     *leftID = 2; // Reads Red
+    Serial.print("Left Found Red\n");
   }else if(leftBlueReading < blueBMaxLeft && leftBlueReading > blueBMinLeft && leftRedReading < blueRMaxLeft && leftRedReading > blueRMinLeft){
     *leftID = 3; // Reads Blue
+    Serial.print("Left Found Blue\n");
   }else if(leftBlueReading < yellowBMaxLeft && leftBlueReading > yellowBMinLeft && leftRedReading < yellowRMaxLeft && leftRedReading > yellowRMinLeft){
     *leftID = 4; // Reads Yellow
+    Serial.print("Left Found Yellow\n");
+  }else{
+    Serial.print("Left Found Invalid\n");
+    Serial.print("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
   }
 
   // Code for checking right color
   if(rightBlueReading < blackBMaxRight && rightBlueReading > blackBMinRight && rightRedReading < blackRMaxRight && rightRedReading > blackRMinRight){
     *rightID = 1; // Reads Black
+    Serial.print("Right Found Black\n");
   }else if(rightBlueReading < redBMaxRight && rightBlueReading > redBMinRight && rightRedReading < redRMaxRight && rightRedReading > redRMinRight){
     *rightID = 2; // Reads Red
+    Serial.print("Right Found Red\n");
   }else if(rightBlueReading < blueBMaxRight && rightBlueReading > blueBMinRight && rightRedReading < blueRMaxRight && rightRedReading > blueRMinRight){
     *rightID = 3; // Reads Blue
+    Serial.print("Right Found Blue\n");
   }else if(rightBlueReading < yellowBMaxRight && rightBlueReading > yellowBMinRight && rightRedReading < yellowRMaxRight && rightRedReading > yellowRMinRight){
     *rightID = 4; // Reads Yellow
+    Serial.print("Right Found Yellow\n");
+  }else{
+    Serial.print("Right Found Invalid\n");
+    Serial.print("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
   }
 }
 
@@ -513,6 +527,14 @@ void getColor(int *leftID, int *rightID){
 //   yellowRMaxLeft  = 0.00;
 //   yellowRMinLeft  = 10000.0;
 // }
+
+void testColor(){
+  int temp1;
+  int temp2;
+  for(int i = 0; i < 10; i++){
+    getColor(&temp1, &temp2);
+  }
+}
 
 void collectMinMax(){
   float leftReading = 0;
@@ -726,48 +748,14 @@ void collectMinMax(){
 }
 
 void printMinMax(){
-  String tempText = "Black Surface Left Red LED Max: ";
-  String minText = " & Min: ";
-  // String avgText = " & Avg: ";
-  String rightText = "\n Right LED Max: ";
-  String outText = tempText + blackRMaxLeft + minText + blackRMinLeft + rightText + blackRMaxRight + minText + blackRMinRight;
-
-  Serial.print(outText);
-
-  tempText = "\nBlack Surface Left Blue LED Max: ";
-  outText = tempText + blackBMaxLeft + minText + blackBMinLeft + rightText + blackBMaxRight + minText + blackBMinRight;
-
-  Serial.print(outText);
-  
-  tempText = "\nRed Surface Left Red LED Max: ";
-  outText = tempText + redRMaxLeft + minText + redRMinLeft + rightText + redRMaxRight + minText + redRMinRight;
-
-  Serial.print(outText);
-  
-  tempText = "\nRed Surface Left Blue LED Max: ";
-  outText = tempText + redBMaxLeft + minText + redBMinLeft + rightText + redBMaxRight + minText + redBMinRight;
-
-  Serial.print(outText);
-
-  tempText = "\nBlue Surface Left Red LED Max: ";
-  outText = tempText + blueRMaxLeft + minText + blueRMinLeft + rightText + blueRMaxRight + minText + blueRMinRight;
-
-  Serial.print(outText);
-
-  tempText = "\nBlue Surface Left Blue LED Max: ";
-  outText = tempText + blueBMaxLeft + minText + blueBMinLeft + rightText + blueBMaxRight + minText + blueBMinRight;
-
-  Serial.print(outText);
-
-  tempText = "\nYellow Surface Left Blue LED Max: ";
-  outText = tempText + yellowBMaxLeft + minText + yellowBMinLeft + rightText + yellowBMaxRight + minText + yellowBMinRight;
-
-  Serial.print(outText);
-
-  tempText = "\nYellow Surface Left Red LED Max: ";
-  outText = tempText + yellowRMaxLeft + minText + yellowRMinLeft + rightText + yellowRMaxRight + minText + yellowRMinRight;
-
-  Serial.print(outText);
+  Serial.print("Black Surface Blue LED Range:     " + (String)blackBMinLeft + " - " + (String)blackBMaxLeft + " & " + (String)blackBMinRight + " - " + (String)blackBMaxRight);
+  Serial.print("Black Surface Red LED Range:      " + (String)blackRMinLeft + " - " + (String)blackRMaxLeft + " & " + (String)blackRMinRight + " - " + (String)blackRMaxRight);
+  Serial.print("Red Surface Blue LED Range:       " + (String)redBMinLeft + " - " + (String)redBMaxLeft + " & " + (String)redBMinRight + " - " + (String)redBMaxRight);
+  Serial.print("Red Surface Red LED Range:        " + (String)redRMinLeft + " - " + (String)redRMaxLeft + " & " + (String)redRMinRight + " - " + (String)redRMaxRight);
+  Serial.print("Blue Surface Blue LED Range:      " + (String)blueBMinLeft + " - " + (String)blueBMaxLeft + " & " + (String)blueBMinRight + " - " + (String)blueBMaxRight);
+  Serial.print("Blue Surface Red LED Range:       " + (String)blueRMinLeft + " - " + (String)blueRMaxLeft + " & " + (String)blueRMinRight + " - " + (String)blueRMaxRight);
+  Serial.print("Yellow Surface Blue LED Range:    " + (String)yellowBMinLeft + " - " + (String)yellowBMaxLeft + " & " + (String)yellowBMinRight + " - " + (String)yellowBMaxRight);
+  Serial.print("Yellow Surface Red LED Range:     " + (String)yellowRMinLeft + " - " + (String)yellowRMaxLeft + " & " + (String)yellowRMinRight + " - " + (String)yellowRMaxRight);
 }
 
 // void minMaxHelper(int color){
@@ -873,19 +861,24 @@ void followColor(int targetColorID){
   float wallDetectionVal = analogRead(IRInputPin);
   int leftColorID = 0;
   int rightColorID = 0;
+  bool rightOn = false;
   while(wallDetectionVal > wallThreshold){
     getColor(&leftColorID, &rightColorID);
     // Went too far right
-    if(leftColorID != targetColorID){
-      turnLeft();
-      delay(100);
+    if(leftColorID == 1 && rightColorID == targetColorID){
+      turnRightWide();
+      rightOn = true;
+    }else if(leftColorID == targetColorID && rightColorID == targetColorID){
       forward();
-    }
-    // Went too far left
-    if(rightColorID != targetColorID){
-      turnRight();
-      delay(100);
-      forward();
+    }else if(leftColorID == targetColorID && rightColorID == 1){
+      turnLeftWide();
+      rightOn = false;
+    }else{
+      if(rightOn){
+        turnRight();
+      }else{
+        turnLeft();
+      }
     }
     wallDetectionVal = analogRead(IRInputPin);
   }
