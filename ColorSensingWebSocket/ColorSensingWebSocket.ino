@@ -455,49 +455,69 @@ void getColor(int *leftID, int *rightID){
   digitalWrite(bluePin, 0);
   digitalWrite(redPin, 0);
 
+  client.beginMessage(TYPE_TEXT);
   // Code for checking left color
   if(leftBlueReading < blackBMaxLeft && leftBlueReading > blackBMinLeft && leftRedReading < blackRMaxLeft && leftRedReading > blackRMinLeft){
     *leftID = 1; // Reads Black
-    Serial.println("Left Found Black");
-    Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
+    // Serial.println("Left Found Black");
+    // Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
+    client.print("Left Found Black");
   }else if(leftBlueReading < redBMaxLeft && leftBlueReading > redBMinLeft && leftRedReading < redRMaxLeft && leftRedReading > redRMinLeft){
     *leftID = 2; // Reads Red
-    Serial.println("Left Found Red");
-    Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
+    // Serial.println("Left Found Red");
+    // Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
+    client.print("Left Found Red");
   }else if(leftBlueReading < blueBMaxLeft && leftBlueReading > blueBMinLeft && leftRedReading < blueRMaxLeft && leftRedReading > blueRMinLeft){
     *leftID = 3; // Reads Blue
-    Serial.println("Left Found Blue");
-    Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
+    // Serial.println("Left Found Blue");
+    // Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
+    client.print("Left Found Blue");
   }else if(leftBlueReading < yellowBMaxLeft && leftBlueReading > yellowBMinLeft && leftRedReading < yellowRMaxLeft && leftRedReading > yellowRMinLeft){
     *leftID = 4; // Reads Yellow
-    Serial.println("Left Found Yellow");
-    Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
+    // Serial.println("Left Found Yellow");
+    // Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
+    client.print("Left Found Yellow");
   }else{
-    Serial.println("Left Found Invalid");
-    Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
+    // Serial.println("Left Found Invalid");
+    // Serial.println("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
+    client.print("Left Found Invalid");
+    client.endMessage();
+    client.beginMessage(TYPE_TEXT);
+    client.print("Left Blue Reading: " + (String)leftBlueReading + " Left Red Reading: " + (String)leftRedReading);
   }
+  client.endMessage();
 
+  client.beginMessage(TYPE_TEXT);
   // Code for checking right color
   if(rightBlueReading < blackBMaxRight && rightBlueReading > blackBMinRight && rightRedReading < blackRMaxRight && rightRedReading > blackRMinRight){
     *rightID = 1; // Reads Black
-    Serial.println("Right Found Black");
-    Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
+    // Serial.println("Right Found Black");
+    // Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
+    client.print("Right Found Black");
   }else if(rightBlueReading < redBMaxRight && rightBlueReading > redBMinRight && rightRedReading < redRMaxRight && rightRedReading > redRMinRight){
     *rightID = 2; // Reads Red
-    Serial.println("Right Found Red");
-    Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
+    // Serial.println("Right Found Red");
+    // Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
+    client.print("Right Found Red");
   }else if(rightBlueReading < blueBMaxRight && rightBlueReading > blueBMinRight && rightRedReading < blueRMaxRight && rightRedReading > blueRMinRight){
     *rightID = 3; // Reads Blue
-    Serial.println("Right Found Blue");
-    Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
+    // Serial.println("Right Found Blue");
+    // Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
+    client.print("Right Found Blue");
   }else if(rightBlueReading < yellowBMaxRight && rightBlueReading > yellowBMinRight && rightRedReading < yellowRMaxRight && rightRedReading > yellowRMinRight){
     *rightID = 4; // Reads Yellow
-    Serial.println("Right Found Yellow");
-    Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
+    // Serial.println("Right Found Yellow");
+    // Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
+    client.print("Right Found Yellow");
   }else{
-    Serial.println("Right Found Invalid");
-    Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
+    // Serial.println("Right Found Invalid");
+    // Serial.println("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
+    client.print("Right Found Invalid");
+    client.endMessage();
+    client.beginMessage(TYPE_TEXT);
+    client.print("Right Blue Reading: " + (String)rightBlueReading + " Right Red Reading: " + (String)rightRedReading);
   }
+  client.endMessage();
 }
 
 void testColor(){
@@ -930,11 +950,11 @@ void collectMinMax(){
   redBMinRight     -= 15;
   redRMaxRight     += 15;
   redRMinRight     -= 15;
-  blueBMaxRight    += 15;
-  blueBMinRight    -= 15;
+  blueBMaxRight    += 60;
+  blueBMinRight    -= 60;
   blueRMaxRight    += 15;
   blueRMinRight    -= 15;
-  yellowBMaxRight  += 15;
+  yellowBMaxRight  += 60;
   yellowBMinRight  -= 15;
   yellowRMaxRight  += 15;
   yellowRMinRight  -= 15;
@@ -958,14 +978,39 @@ void collectMinMax(){
 }
 
 void printMinMax(){
-  Serial.println("Black Surface Blue LED Range:     " + (String)blackBMinLeft + " - " + (String)blackBMaxLeft + " & " + (String)blackBMinRight + " - " + (String)blackBMaxRight);
-  Serial.println("Black Surface Red LED Range:      " + (String)blackRMinLeft + " - " + (String)blackRMaxLeft + " & " + (String)blackRMinRight + " - " + (String)blackRMaxRight);
-  Serial.println("Red Surface Blue LED Range:       " + (String)redBMinLeft + " - " + (String)redBMaxLeft + " & " + (String)redBMinRight + " - " + (String)redBMaxRight);
-  Serial.println("Red Surface Red LED Range:        " + (String)redRMinLeft + " - " + (String)redRMaxLeft + " & " + (String)redRMinRight + " - " + (String)redRMaxRight);
-  Serial.println("Blue Surface Blue LED Range:      " + (String)blueBMinLeft + " - " + (String)blueBMaxLeft + " & " + (String)blueBMinRight + " - " + (String)blueBMaxRight);
-  Serial.println("Blue Surface Red LED Range:       " + (String)blueRMinLeft + " - " + (String)blueRMaxLeft + " & " + (String)blueRMinRight + " - " + (String)blueRMaxRight);
-  Serial.println("Yellow Surface Blue LED Range:    " + (String)yellowBMinLeft + " - " + (String)yellowBMaxLeft + " & " + (String)yellowBMinRight + " - " + (String)yellowBMaxRight);
-  Serial.println("Yellow Surface Red LED Range:     " + (String)yellowRMinLeft + " - " + (String)yellowRMaxLeft + " & " + (String)yellowRMinRight + " - " + (String)yellowRMaxRight);
+  // Serial.println("Black Surface Blue LED Range:     " + (String)blackBMinLeft   + " - " + (String)blackBMaxLeft   + " & " + (String)blackBMinRight  + " - " + (String)blackBMaxRight);
+  // Serial.println("Black Surface Red LED Range:      " + (String)blackRMinLeft   + " - " + (String)blackRMaxLeft   + " & " + (String)blackRMinRight  + " - " + (String)blackRMaxRight);
+  // Serial.println("Red Surface Blue LED Range:       " + (String)redBMinLeft     + " - " + (String)redBMaxLeft     + " & " + (String)redBMinRight    + " - " + (String)redBMaxRight);
+  // Serial.println("Red Surface Red LED Range:        " + (String)redRMinLeft     + " - " + (String)redRMaxLeft     + " & " + (String)redRMinRight    + " - " + (String)redRMaxRight);
+  // Serial.println("Blue Surface Blue LED Range:      " + (String)blueBMinLeft    + " - " + (String)blueBMaxLeft    + " & " + (String)blueBMinRight   + " - " + (String)blueBMaxRight);
+  // Serial.println("Blue Surface Red LED Range:       " + (String)blueRMinLeft    + " - " + (String)blueRMaxLeft    + " & " + (String)blueRMinRight   + " - " + (String)blueRMaxRight);
+  // Serial.println("Yellow Surface Blue LED Range:    " + (String)yellowBMinLeft  + " - " + (String)yellowBMaxLeft  + " & " + (String)yellowBMinRight + " - " + (String)yellowBMaxRight);
+  // Serial.println("Yellow Surface Red LED Range:     " + (String)yellowRMinLeft  + " - " + (String)yellowRMaxLeft  + " & " + (String)yellowRMinRight + " - " + (String)yellowRMaxRight);
+  client.beginMessage(TYPE_TEXT);
+  client.print("Black Surface Blue LED Range:     " + (String)blackBMinLeft   + " - " + (String)blackBMaxLeft   + " & " + (String)blackBMinRight  + " - " + (String)blackBMaxRight);
+  client.endMessage();
+  client.beginMessage(TYPE_TEXT);
+  client.print("Black Surface Red LED Range:      " + (String)blackRMinLeft   + " - " + (String)blackRMaxLeft   + " & " + (String)blackRMinRight  + " - " + (String)blackRMaxRight);
+  client.endMessage();
+  client.beginMessage(TYPE_TEXT);
+  client.print("Red Surface Blue LED Range:       " + (String)redBMinLeft     + " - " + (String)redBMaxLeft     + " & " + (String)redBMinRight    + " - " + (String)redBMaxRight);
+  client.endMessage();
+  client.beginMessage(TYPE_TEXT);
+  client.print("Red Surface Red LED Range:        " + (String)redRMinLeft     + " - " + (String)redRMaxLeft     + " & " + (String)redRMinRight    + " - " + (String)redRMaxRight);
+  client.endMessage();
+  client.beginMessage(TYPE_TEXT);
+  client.print("Blue Surface Blue LED Range:      " + (String)blueBMinLeft    + " - " + (String)blueBMaxLeft    + " & " + (String)blueBMinRight   + " - " + (String)blueBMaxRight);
+  client.endMessage();
+  client.beginMessage(TYPE_TEXT);
+  client.print("Blue Surface Red LED Range:       " + (String)blueRMinLeft    + " - " + (String)blueRMaxLeft    + " & " + (String)blueRMinRight   + " - " + (String)blueRMaxRight);
+  client.endMessage();
+  client.beginMessage(TYPE_TEXT);
+  client.print("Yellow Surface Blue LED Range:    " + (String)yellowBMinLeft  + " - " + (String)yellowBMaxLeft  + " & " + (String)yellowBMinRight + " - " + (String)yellowBMaxRight);
+  client.endMessage();
+  client.beginMessage(TYPE_TEXT);
+  client.print("Yellow Surface Red LED Range:     " + (String)yellowRMinLeft  + " - " + (String)yellowRMaxLeft  + " & " + (String)yellowRMinRight + " - " + (String)yellowRMaxRight);
+  client.endMessage();
+
 }
 
 // TODO: Update followColor to use logic on which side is black and which side is on color, turn accordingly with color updates
