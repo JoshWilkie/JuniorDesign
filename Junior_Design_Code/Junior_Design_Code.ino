@@ -100,9 +100,7 @@ void rotateLeft();
 void rotateRight();
 void reset();
 
-void soloDemo();
-void teamDemoRed();
-void teamDemoBlue();
+void botDemo(int demoMode);
 
 void getColor(int *leftID, int *rightID);
 void followColor(int targetColorID);
@@ -190,82 +188,85 @@ void loop() {
     if(message.endsWith("Sizz")){
       Serial.println("Received a message:");
       Serial.println(message);
-      if(message.endsWith("forwardSizz")){
-        // Serial.print("Calling forward\n");
-        // client.beginMessage(TYPE_TEXT);
-        // client.print("Calling forward");
-        // client.endMessage();
-        forward();
-        delay(testingDelay);
-        reset();
-      }else if(message.endsWith("backwardSizz")){
-        // Serial.print("Calling backward\n");
-        // client.beginMessage(TYPE_TEXT);
-        // client.print("Calling backward");
-        // client.endMessage();
-        backward();
-        delay(testingDelay);
-        reset();
-      }else if(message.endsWith("leftSizz")){
-        // Serial.print("Calling left\n");
-        // client.beginMessage(TYPE_TEXT);
-        // client.print("Calling left");
-        // client.endMessage();
-        turnLeft();
-        delay(testingDelay);
-        reset();
-      }else if(message.endsWith("wideLeftSizz")){
-        // Serial.print("Calling wide left\n");
-        // client.beginMessage(TYPE_TEXT);
-        // client.print("Calling wide left");
-        // client.endMessage();
-        turnLeftWide();
-        delay(testingDelay);
-        reset();
-      }else if(message.endsWith("rightSizz")){
-        // Serial.print("Calling right\n");
-        // client.beginMessage(TYPE_TEXT);
-        // client.print("Calling right");
-        // client.endMessage();
-        turnRight();
-        delay(testingDelay);
-        reset();
-      }else if(message.endsWith("wideRightSizz")){
-        // Serial.print("Calling wide right\n");
-        // client.beginMessage(TYPE_TEXT);
-        // client.print("Calling wide right");
-        // client.endMessage();
-        turnRightWide();
-        delay(testingDelay);
-        reset();
-      }else if(message.endsWith("rotateLeftSizz")){
-        // Serial.print("Calling in place left\n");
-        // client.beginMessage(TYPE_TEXT);
-        // client.print("Calling in place left");
-        // client.endMessage();
-        rotateLeft();
-        delay(testingDelay);
-        reset();
-      }else if(message.endsWith("rotateRightSizz")){
-        // Serial.print("Calling in place right\n");
-        // client.beginMessage(TYPE_TEXT);
-        // client.print("Calling in place right");
-        // client.endMessage();
-        rotateRight();
-        delay(testingDelay);
-        reset();
-      }else if(message.endsWith("resetSizz")){
-        // Serial.print("Calling reset\n");
-        // client.beginMessage(TYPE_TEXT);
-        // client.print("Calling reset");
-        // client.endMessage();
-        reset();
-      }else if(message.endsWith("soloDemoSizz")){
-        soloDemo();
-      }else if(message.endsWith("redDemoSizz")){
-        teamDemoRed();
-      }else if(message.endsWith("blueDemoSizz")){
-        teamDemoBlue();
+      // if(message.endsWith("forwardSizz")){
+      //   // Serial.print("Calling forward\n");
+      //   // client.beginMessage(TYPE_TEXT);
+      //   // client.print("Calling forward");
+      //   // client.endMessage();
+      //   forward();
+      //   delay(testingDelay);
+      //   reset();
+      // }else if(message.endsWith("backwardSizz")){
+      //   // Serial.print("Calling backward\n");
+      //   // client.beginMessage(TYPE_TEXT);
+      //   // client.print("Calling backward");
+      //   // client.endMessage();
+      //   backward();
+      //   delay(testingDelay);
+      //   reset();
+      // }else if(message.endsWith("leftSizz")){
+      //   // Serial.print("Calling left\n");
+      //   // client.beginMessage(TYPE_TEXT);
+      //   // client.print("Calling left");
+      //   // client.endMessage();
+      //   turnLeft();
+      //   delay(testingDelay);
+      //   reset();
+      // }else if(message.endsWith("wideLeftSizz")){
+      //   // Serial.print("Calling wide left\n");
+      //   // client.beginMessage(TYPE_TEXT);
+      //   // client.print("Calling wide left");
+      //   // client.endMessage();
+      //   turnLeftWide();
+      //   delay(testingDelay);
+      //   reset();
+      // }else if(message.endsWith("rightSizz")){
+      //   // Serial.print("Calling right\n");
+      //   // client.beginMessage(TYPE_TEXT);
+      //   // client.print("Calling right");
+      //   // client.endMessage();
+      //   turnRight();
+      //   delay(testingDelay);
+      //   reset();
+      // }else if(message.endsWith("wideRightSizz")){
+      //   // Serial.print("Calling wide right\n");
+      //   // client.beginMessage(TYPE_TEXT);
+      //   // client.print("Calling wide right");
+      //   // client.endMessage();
+      //   turnRightWide();
+      //   delay(testingDelay);
+      //   reset();
+      // }else if(message.endsWith("rotateLeftSizz")){
+      //   // Serial.print("Calling in place left\n");
+      //   // client.beginMessage(TYPE_TEXT);
+      //   // client.print("Calling in place left");
+      //   // client.endMessage();
+      //   rotateLeft();
+      //   delay(testingDelay);
+      //   reset();
+      // }else if(message.endsWith("rotateRightSizz")){
+      //   // Serial.print("Calling in place right\n");
+      //   // client.beginMessage(TYPE_TEXT);
+      //   // client.print("Calling in place right");
+      //   // client.endMessage();
+      //   rotateRight();
+      //   delay(testingDelay);
+      //   reset();
+      // }else if(message.endsWith("resetSizz")){
+      //   // Serial.print("Calling reset\n");
+      //   // client.beginMessage(TYPE_TEXT);
+      //   // client.print("Calling reset");
+      //   // client.endMessage();
+      //   reset();
+      // }else
+      if(message.endsWith("redDemoSoloSizz")){
+        botDemo(1);
+      }else if(message.endsWith("redDemoTeamSizz")){
+        botDemo(2);
+      }else if(message.endsWith("blueDemoSoloSizz")){
+        botDemo(3);
+      }else if(message.endsWith("blueDemoTeamSizz")){
+        botDemo(4);
       }else if(message.endsWith("displayTestSizz")){
         printToScreen("Waiting", "For", "Companion");
       // }else if(message.endsWith("IRTestSizz")){
@@ -286,54 +287,39 @@ void loop() {
     }
   }
 
-  delay(100);
+  delay(500);
   // Serial.print("Still looping\n");
 }
 
-void soloDemo(){
-  String outText = "Wall Detection Value is: ";
+void botDemo(int demoMode){
+  if(demoMode == 4){
+    printToScreen("Waiting", "For", "Companion");
+    int messageSize = client.parseMessage();
+    String message;
+    if (messageSize > 0) {
+      message = client.readString();
+    }
+    while(!message.endsWith("JAQ PETTI FOUND RED")){
+      messageSize = client.parseMessage();
+      if (messageSize > 0) {
+        message = client.readString();
+      }
+    }
+    delay(500);
+  }
+  
   float wallDetectionVal = 0;
   // Read in and trash first 50 wall IR input readings
   for(int i = 0; i < 50; i++){
     wallDetectionVal = analogRead(IRInputPin);
     delay(10);
-    
-    client.beginMessage(TYPE_TEXT);
-    client.print(outText + wallDetectionVal);
-    client.endMessage();
   }
-  printToScreen("Going", "Forward", "To Wall");
-  // float ambientIR;
-  // for(int i = 0; i < 5; i++){
-  //   ambientIR += analogRead(IRInputPin);
-  //   delay(10);
-  // }
-  // ambientIR /= 5;
 
-  // outText = outText + wallDetectionVal;
-  
-  client.beginMessage(TYPE_TEXT);
-  client.print(outText + wallDetectionVal);
-  client.endMessage();
+  printToScreen("Going", "Forward", "To Wall");
 
   // Go forward until reaching wall
   forward();
-  // while(wallDetectionVal > wallThreshold){
-  //   wallDetectionVal = 0;
-  //   for(int i = 0; i < 5; i++){
-  //     wallDetectionVal += analogRead(IRInputPin);
-  //     delay(10);
-  //   }
-  //   wallDetectionVal /= 5;
-  //   // Serial.print("\nwallDetectionVal is: ");
-  //   // Serial.print(wallDetectionVal);
 
-  //   // outText = "Wall Detection Value is: " + wallDetectionVal;
-    
-  //   client.beginMessage(TYPE_TEXT);
-  //   client.print(outText + wallDetectionVal);
-  //   client.endMessage();
-  // }
   while(wallDetectionVal > wallThreshold){
     wallDetectionVal = analogRead(IRInputPin);
     delay(10);
@@ -343,41 +329,75 @@ void soloDemo(){
   // Spin in place then go back towards where we started
   printToScreen("Turning", "Around", "");
   delay(100);
-  rotateRight();
+  if(demoMode == 3 || demoMode == 4){
+    rotateLeft();
+  }else{
+    rotateRight();
+  }
+
   // How long we rotate for
   delay(2800);
   reset();
   delay(100);
-  printToScreen("Finding", "Red Lane", "");
+  int targetColorID;
+  if(demoMode == 3 || demoMode == 4){
+    printToScreen("Finding", "Blue Lane", "");
+    targetColorID = 3;
+  }else{
+    printToScreen("Finding", "Red Lane", "");
+    targetColorID = 2;
+  }
   forward();
 
   // delay(4000);
   // reset();
 
-  // Go forward until we reach red
+  // Go forward until we reach color
   int leftColorID = 0;
   int rightColorID = 0;
-  while(rightColorID != 2){
+  while(rightColorID != targetColorID){
     getColor(&leftColorID, &rightColorID);
   }
   reset();
-
-  printToScreen("Turning", "Onto Red", "Lane");
-  delay(100);
-  rotateLeft();
+  if(demoMode == 3 || demoMode == 4){
+    if(demoMode == 4){
+      client.beginMessage(TYPE_TEXT);
+      client.print("foundBlueSizz");
+      client.endMessage();
+    }
+    printToScreen("Turning", "Onto Blue", "Lane");
+    delay(100);
+    rotateRight();
+  }else{
+    if(demoMode == 2){
+      client.beginMessage(TYPE_TEXT);
+      client.print("foundRedSizz");
+      client.endMessage();
+    }
+    printToScreen("Turning", "Onto Red", "Lane");
+    delay(100);
+    rotateLeft();
+  }
   delay(750);
   reset();
   delay(100);
 
-  // Follow red
-  printToScreen("Following", "Red Lane", "");
-  followColor(2);
+  // Follow color
+  if(demoMode == 3 || demoMode == 4){
+    printToScreen("Following", "Blue Lane", "");
+  }else{
+    printToScreen("Following", "Red Lane", "");
+  }
+  followColor(targetColorID);
 
   // Spin in place then go towards yellow line
   printToScreen("Turning", "To Yellow", "Lane");
   delay(100);
-  rotateLeft();
-  // TODO: Make sure good turn radius (probably want to overturn)
+  if(demoMode == 3 || demoMode == 4){
+    rotateRight();
+  }else{
+    rotateLeft();
+  }
   delay(1700);
   reset();
   delay(100);
@@ -395,10 +415,44 @@ void soloDemo(){
   // Turn towards yellow line
   printToScreen("Turning", "Onto Yel-", "low Lane");
   delay(100);
-  rotateLeft();
+  if(demoMode == 3 || demoMode == 4){
+    rotateRight();
+  }else{
+    rotateLeft();
+  }
   delay(1000);
   reset();
   delay(100);
+
+  if(demoMode == 2){
+    printToScreen("Waiting", "For", "Companion");
+    int messageSize = client.parseMessage();
+    String message;
+    if (messageSize > 0) {
+      message = client.readString();
+    }
+    while(!message.endsWith("JAQ PETTI FOUND BLUE")){
+      messageSize = client.parseMessage();
+      if (messageSize > 0) {
+        message = client.readString();
+      }
+    }
+    delay(500);
+  }else if(demoMode == 4){
+    printToScreen("Waiting", "For", "Companion");
+    int messageSize = client.parseMessage();
+    String message;
+    if (messageSize > 0) {
+      message = client.readString();
+    }
+    while(!message.endsWith("JAQ PETTI HOME")){
+      messageSize = client.parseMessage();
+      if (messageSize > 0) {
+        message = client.readString();
+      }
+    }
+    delay(500);
+  }
 
   // Follow yellow
   printToScreen("Following", "Yellow", "Lane");
@@ -408,7 +462,11 @@ void soloDemo(){
   // Turn towards original position
   printToScreen("Turning", "Towards", "Origin");
   delay(100);
-  rotateLeft();
+  if(demoMode == 3 || demoMode == 4){
+    rotateRight();
+  }else{
+    rotateLeft();
+  }
   // Tweak turn duration
   delay(1700);
   reset();
@@ -435,14 +493,6 @@ void soloDemo(){
   reset();
 
   printToScreen("Finished!", "", "    :)");
-}
-
-void teamDemoRed(){
-  
-}
-
-void teamDemoBlue(){
-  
 }
 
 void getColor(int *leftID, int *rightID){
@@ -996,34 +1046,32 @@ void printMinMax(){
   // Serial.println("Blue Surface Red LED Range:       " + (String)blueRMinLeft    + " - " + (String)blueRMaxLeft    + " & " + (String)blueRMinRight   + " - " + (String)blueRMaxRight);
   // Serial.println("Yellow Surface Blue LED Range:    " + (String)yellowBMinLeft  + " - " + (String)yellowBMaxLeft  + " & " + (String)yellowBMinRight + " - " + (String)yellowBMaxRight);
   // Serial.println("Yellow Surface Red LED Range:     " + (String)yellowRMinLeft  + " - " + (String)yellowRMaxLeft  + " & " + (String)yellowRMinRight + " - " + (String)yellowRMaxRight);
-  client.beginMessage(TYPE_TEXT);
-  client.print("Black Surface Blue LED Range:     " + (String)blackBMinLeft   + " - " + (String)blackBMaxLeft   + " & " + (String)blackBMinRight  + " - " + (String)blackBMaxRight);
-  client.endMessage();
-  client.beginMessage(TYPE_TEXT);
-  client.print("Black Surface Red LED Range:      " + (String)blackRMinLeft   + " - " + (String)blackRMaxLeft   + " & " + (String)blackRMinRight  + " - " + (String)blackRMaxRight);
-  client.endMessage();
-  client.beginMessage(TYPE_TEXT);
-  client.print("Red Surface Blue LED Range:       " + (String)redBMinLeft     + " - " + (String)redBMaxLeft     + " & " + (String)redBMinRight    + " - " + (String)redBMaxRight);
-  client.endMessage();
-  client.beginMessage(TYPE_TEXT);
-  client.print("Red Surface Red LED Range:        " + (String)redRMinLeft     + " - " + (String)redRMaxLeft     + " & " + (String)redRMinRight    + " - " + (String)redRMaxRight);
-  client.endMessage();
-  client.beginMessage(TYPE_TEXT);
-  client.print("Blue Surface Blue LED Range:      " + (String)blueBMinLeft    + " - " + (String)blueBMaxLeft    + " & " + (String)blueBMinRight   + " - " + (String)blueBMaxRight);
-  client.endMessage();
-  client.beginMessage(TYPE_TEXT);
-  client.print("Blue Surface Red LED Range:       " + (String)blueRMinLeft    + " - " + (String)blueRMaxLeft    + " & " + (String)blueRMinRight   + " - " + (String)blueRMaxRight);
-  client.endMessage();
-  client.beginMessage(TYPE_TEXT);
-  client.print("Yellow Surface Blue LED Range:    " + (String)yellowBMinLeft  + " - " + (String)yellowBMaxLeft  + " & " + (String)yellowBMinRight + " - " + (String)yellowBMaxRight);
-  client.endMessage();
-  client.beginMessage(TYPE_TEXT);
-  client.print("Yellow Surface Red LED Range:     " + (String)yellowRMinLeft  + " - " + (String)yellowRMaxLeft  + " & " + (String)yellowRMinRight + " - " + (String)yellowRMaxRight);
-  client.endMessage();
-
+  // client.beginMessage(TYPE_TEXT);
+  // client.print("Black Surface Blue LED Range:     " + (String)blackBMinLeft   + " - " + (String)blackBMaxLeft   + " & " + (String)blackBMinRight  + " - " + (String)blackBMaxRight);
+  // client.endMessage();
+  // client.beginMessage(TYPE_TEXT);
+  // client.print("Black Surface Red LED Range:      " + (String)blackRMinLeft   + " - " + (String)blackRMaxLeft   + " & " + (String)blackRMinRight  + " - " + (String)blackRMaxRight);
+  // client.endMessage();
+  // client.beginMessage(TYPE_TEXT);
+  // client.print("Red Surface Blue LED Range:       " + (String)redBMinLeft     + " - " + (String)redBMaxLeft     + " & " + (String)redBMinRight    + " - " + (String)redBMaxRight);
+  // client.endMessage();
+  // client.beginMessage(TYPE_TEXT);
+  // client.print("Red Surface Red LED Range:        " + (String)redRMinLeft     + " - " + (String)redRMaxLeft     + " & " + (String)redRMinRight    + " - " + (String)redRMaxRight);
+  // client.endMessage();
+  // client.beginMessage(TYPE_TEXT);
+  // client.print("Blue Surface Blue LED Range:      " + (String)blueBMinLeft    + " - " + (String)blueBMaxLeft    + " & " + (String)blueBMinRight   + " - " + (String)blueBMaxRight);
+  // client.endMessage();
+  // client.beginMessage(TYPE_TEXT);
+  // client.print("Blue Surface Red LED Range:       " + (String)blueRMinLeft    + " - " + (String)blueRMaxLeft    + " & " + (String)blueRMinRight   + " - " + (String)blueRMaxRight);
+  // client.endMessage();
+  // client.beginMessage(TYPE_TEXT);
+  // client.print("Yellow Surface Blue LED Range:    " + (String)yellowBMinLeft  + " - " + (String)yellowBMaxLeft  + " & " + (String)yellowBMinRight + " - " + (String)yellowBMaxRight);
+  // client.endMessage();
+  // client.beginMessage(TYPE_TEXT);
+  // client.print("Yellow Surface Red LED Range:     " + (String)yellowRMinLeft  + " - " + (String)yellowRMaxLeft  + " & " + (String)yellowRMinRight + " - " + (String)yellowRMaxRight);
+  // client.endMessage();
 }
 
-// TODO: Update followColor to use logic on which side is black and which side is on color, turn accordingly with color updates
 void followColor(int targetColorID){
   // Follow
   float wallDetectionVal = analogRead(IRInputPin);
